@@ -1,0 +1,22 @@
+{
+  "name": "chainpoint-client",
+  "version": "0.0.1",
+  "description": "Chainpoint API client",
+  "main": "index.js",
+  "author": "Glenn Rempe <glenn@tierion.com>",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "devDependencies": {},
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "chainpoint-binary": "^4.0.1",
+    "chainpoint-parse": "^2.0.3",
+    "lodash": "^4.17.4",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "validator": "^9.1.1"
+  }
+}
