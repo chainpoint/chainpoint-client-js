@@ -65,9 +65,9 @@ chainpoint-binary@^4.0.0, chainpoint-binary@^4.0.1:
     msgpack-lite "^0.1.26"
     pako "^1.0.5"
 
-chainpoint-parse@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/chainpoint-parse/-/chainpoint-parse-2.0.3.tgz#bc6bb46426ce31b7a2bb81a0b133a4aaa5847529"
+chainpoint-parse@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/chainpoint-parse/-/chainpoint-parse-2.1.0.tgz#586520a57d4d7098e7a61ed95ee7c89612deab79"
   dependencies:
     chainpoint-binary "^4.0.0"
     chainpoint-proof-json-schema "^1.0.0"
@@ -393,6 +393,10 @@ tunnel-agent@^0.6.0:
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
+
+uuid-validate@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/uuid-validate/-/uuid-validate-0.0.2.tgz#ed883d26cf0d1819763abfa315e9626ddb67c8e8"
 
 uuid@^3.1.0:
   version "3.1.0"
