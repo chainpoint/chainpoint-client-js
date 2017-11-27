@@ -29,14 +29,16 @@ const DNS_CORE_DISCOVERY_ADDR = '_core.addr.chainpoint.org'
 /**
  * Check if valid Core URI
  *
- * @param {string} coreAddr - The URI to check
- * @returns {bool} true if value is a valid Core URI, otherwise false
+ * @param {string} coreURI - The Core URI to test for validity
+ * @returns {bool} true if coreURI is a valid Core URI, otherwise false
  */
-function _isValidCoreAddr (coreAddr) {
-  if (_.isEmpty(coreAddr) || !_.isString(coreAddr)) return false
+function _isValidCoreURI (coreURI) {
+  if (_.isEmpty(coreURI) || !_.isString(coreURI)) return false
 
   try {
-    return validator.isURL(coreAddr, {
+    return validator.isURL(coreURI, {
+      protocols: ['https'],
+      require_protocol: true,
       host_whitelist: [/^[a-z]\.chainpoint\.org$/]
     })
   } catch (error) {
@@ -45,13 +47,17 @@ function _isValidCoreAddr (coreAddr) {
 }
 
 /**
- * Retrieve the URI for a DNS discoverable Core API endpoint.
+ * Retrieve an Array of discovered Core URIs. Returns one Core URI by default.
  *
+ * @param {Integer} num - Max number of Core URI's to return.
  * @param {function} callback - An optional callback function.
- * @returns {string} - Returns either a callback or a Promise with a Core URI string
+ * @returns {string} - Returns either a callback or a Promise with an Array of Core URI strings.
  */
-function getCore (callback) {
+function getCores (num, callback) {
   callback = callback || function () {}
+  num = num || 1
+
+  if (!_.isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
 
   return new Promise(function (resolve, reject) {
     dns.resolveTxt(DNS_CORE_DISCOVERY_ADDR, (err, records) => {
@@ -66,19 +72,19 @@ function getCore (callback) {
         return callback(err)
       }
 
-      // Pick a discoverd Core at random and return it as string
-      let core = _.head(_.sample(records))
+      let cores = _.map(records, coreIP => {
+        return 'https://' + coreIP
+      })
 
-      // Verify that the discovered Core is valid
-      if (_isValidCoreAddr(core)) {
-        let coreURI = 'https://' + core
-        resolve(coreURI)
-        return callback(null, coreURI)
-      } else {
-        let err = new Error(`invalid core address : ${core}`)
-        reject(err)
-        return callback(err)
-      }
+      // randomize the order
+      let shuffledCores = _.shuffle(cores)
+      // only return cores with valid addresses (should be all)
+      let filteredCores = _.filter(shuffledCores, function (c) { return _isValidCoreURI(c) })
+      // only return num cores
+      let slicedCores = _.slice(filteredCores, 0, num)
+
+      resolve(slicedCores)
+      return callback(null, slicedCores)
     })
   })
 }
@@ -112,19 +118,19 @@ function _isValidNodeURI (nodeURI) {
  * Retrieve an Array of discovered Node URIs. Returns three Node URIs by default.
  * Can only return up to the number of Nodes that Core provides.
  *
- * @param {Integer} max - Max number of Nodes to return.
+ * @param {Integer} num - Max number of Node URIs to return.
  * @param {function} callback - An optional callback function.
  * @returns {Array<String>} - Returns either a callback or a Promise with an Array of Node URI strings
  */
-function getNodes (maxNodes, callback) {
+function getNodes (num, callback) {
   callback = callback || function () {}
-  maxNodes = maxNodes || 3
+  num = num || 3
 
-  if (!_.isInteger(maxNodes) || maxNodes < 1) throw new Error('maxNodes arg must be an Integer >= 1')
+  if (!_.isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
 
   return new Promise(function (resolve, reject) {
-    getCore().then(coreURI => {
-      let getNodeURI = coreURI + '/nodes/random'
+    getCores(1).then(coreURI => {
+      let getNodeURI = _.first(coreURI) + '/nodes/random'
       request({ uri: getNodeURI, json: true }, (err, response, body) => {
         if (err) {
           reject(err)
@@ -138,7 +144,7 @@ function getNodes (maxNodes, callback) {
         // only return nodes with valid addresses (should be all)
         let filteredNodes = _.filter(shuffledNodes, function (n) { return _isValidNodeURI(n) })
         // only return maxNodes nodes
-        let slicedNodes = _.slice(filteredNodes, 0, maxNodes)
+        let slicedNodes = _.slice(filteredNodes, 0, num)
 
         resolve(slicedNodes)
         return callback(null, slicedNodes)
@@ -338,8 +344,8 @@ function submitHashes (hashes, uris, callback) {
   if (!_.isArray(uris)) throw new Error('uris arg must be an Array of String URIs')
 
   if (_.isEmpty(uris)) {
-    // empty : get a list of nodes via service discovery
-    nodesPromise = getNodes()
+    // get a list of nodes via service discovery
+    nodesPromise = getNodes(3)
   } else {
     // eliminate duplicate URIs
     uris = _.uniq(uris)
@@ -612,7 +618,7 @@ function verifyProofs (proofs, uri, callback) {
 }
 
 module.exports = {
-  getCore: getCore,
+  getCores: getCores,
   getNodes: getNodes,
   submitHashes: submitHashes,
   getProofs: getProofs,
