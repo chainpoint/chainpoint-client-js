@@ -5,11 +5,16 @@
   "main": "index.js",
   "author": "Glenn Rempe <glenn@tierion.com>",
   "license": "Apache-2.0",
+  "repository": "https://github.com/chainpoint/chainpoint-client-js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bundle": "./node_modules/.bin/browserify --standalone chainpointClient index.js -o docs/bundle.js",
+    "bundle-size": "./node_modules/.bin/browserify --list index.js | xargs ls -la | sort -r"
   },
   "keywords": [],
-  "devDependencies": {},
+  "devDependencies": {
+    "browserify": "^14.3.0"
+  },
   "dependencies": {
     "bluebird": "^3.5.1",
     "chainpoint-binary": "^4.0.1",
@@ -18,6 +23,6 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "uuid-validate": "^0.0.2",
-    "validator": "^9.1.1"
+    "validator": "^9.1.2"
   }
 }
