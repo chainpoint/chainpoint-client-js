@@ -254,7 +254,7 @@ cp.submitHashes(hashes, function (err, data) {
 })
 ```
 
-### Promise Style Example
+### Promises `.then/.catch` Style Example
 
 ```javascript
 var cp = require('chainpoint-client')
@@ -272,7 +272,7 @@ cp.submitHashes(hashes, testNodesArray).then(function (data) {
 })
 ```
 
-### `async/await` Style Example
+### Promises `async/await` Style Example
 
 ```javascript
 var cp = require('chainpoint-client')
