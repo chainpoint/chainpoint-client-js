@@ -1,4 +1,4 @@
-/* Copyright 2017 Tierion
+/* Copyright 2017-2018 Tierion
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -9,8 +9,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
-// @ts-check
 
 'use strict'
 
@@ -222,7 +220,6 @@ function _mapSubmitHashesRespToProofHandles (respArray) {
 
   _.forEach(respArray, resp => {
     _.forEach(resp.hashes, hash => {
-      // console.log(JSON.stringify(hash))
       let handle = {}
       handle.uri = resp.meta.submitted_to
       handle.hash = hash.hash
@@ -278,11 +275,7 @@ function _flattenProofs (parsedProofs) {
   let flatProofAnchors = []
 
   _.forEach(parsedProofs, parsedProof => {
-    // console.log(parsedProof)
-
     _.forEach(parsedProof.branches, parsedProofTopBranch => {
-      // console.log(parsedProofTopBranch)
-
       _.forEach(parsedProofTopBranch.anchors, topBranchAnchor => {
         let flatAnchor = {}
         flatAnchor.hash = parsedProof.hash
@@ -298,8 +291,6 @@ function _flattenProofs (parsedProofs) {
       })
 
       _.forEach(parsedProofTopBranch.branches, parsedProofSubBranch => {
-        // console.log(parsedProofSubBranch)
-
         _.forEach(parsedProofSubBranch.anchors, subBranchAnchor => {
           let flatInnerAnchor = {}
           flatInnerAnchor.hash = parsedProof.hash
@@ -472,7 +463,6 @@ function getProofs (proofHandles, callback) {
         // Map the JSON response to Object form.
         try {
           _.forEach(flatParsedBody, proofResp => {
-            // console.log(JSON.stringify(proofResp))
             let r = {}
             r.hashIDNode = proofResp.hash_id_node
             r.proof = proofResp.proof
@@ -545,8 +535,6 @@ function verifyProofs (proofs, uri, callback) {
       nodesPromise.then((nodes) => {
         return _.first(nodes)
       }).then(node => {
-        // console.log('node', node)
-
         // Parse and validate all provided proofs. The hash that
         // results from parsing will be used to validate the proof.
         let parsedProofs = _parseProofs(normalizedProofs)
@@ -560,12 +548,9 @@ function verifyProofs (proofs, uri, callback) {
         })
 
         let uniqSingleNodeFlatProofs = _.uniqWith(singleNodeFlatProofs, _.isEqual)
-        // console.log(uniqSingleNodeFlatProofs)
 
         return uniqSingleNodeFlatProofs
       }).then(flatProofs => {
-        // console.log(flatProofs)
-
         let anchorURIs = []
         _.forEach(flatProofs, proof => {
           anchorURIs.push(proof.uri)
@@ -587,14 +572,10 @@ function verifyProofs (proofs, uri, callback) {
 
         return [flatProofs, nodesWithGetOpts]
       }).then(([flatProofs, nodesWithGetOpts]) => {
-        // console.log(flatProofs)
-        // console.log(nodesWithGetOpts)
-
         // Perform parallel GET requests to all Nodes with proofs
         let hashesByNodeURI = Promise.map(nodesWithGetOpts, rp, {concurrency: 25}).then(parsedBody => {
           // Promise.map returns an Array entry for each host it submits to.
           let flatParsedBody = _.flatten(parsedBody)
-          // console.log(flatParsedBody)
 
           let r = {}
 
@@ -610,16 +591,11 @@ function verifyProofs (proofs, uri, callback) {
 
         return [flatProofs, hashesByNodeURI]
       }).then(([flatProofs, hashesByNodeURI]) => {
-        // console.log(JSON.stringify(flatProofs, null, 2))
-
         // Fulfill the Promise for all of the request results.
         hashesByNodeURI.then(hashesFound => {
-          // console.log(JSON.stringify(hashesFound, null, 2))
-
           let results = []
 
           _.forEach(flatProofs, flatProof => {
-            // console.log(hashFound)
             if (flatProof.expected_value === hashesFound[flatProof.uri]) {
               // IT'S GOOD!
               flatProof.verified = true
