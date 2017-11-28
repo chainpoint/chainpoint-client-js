@@ -194,18 +194,6 @@ function _isValidUUID (uuid) {
 }
 
 /**
- * Checks if param is a function
- *
- * @param {string} parm - The param to check
- * @returns {bool} true if value is a function, otherwise false
- */
-function _isFunction (param) {
-  if (typeof param === 'function') {
-    return true
-  }
-}
-
-/**
  * Map the JSON API response from submitting a hash to a Node to a
  * more accessible form that can also be used as the input arg to
  * getProofs function.
@@ -323,7 +311,7 @@ function submitHashes (hashes, uris, callback) {
   let nodesPromise
 
   // Validate callback is a function
-  if (!_isFunction(callback)) throw new Error('callback arg must be a function')
+  if (!_.isFunction(callback)) throw new Error('callback arg must be a function')
 
   // Validate all hashes provided
   if (!_.isArray(hashes)) throw new Error('hashes arg must be an Array')
@@ -409,7 +397,7 @@ function getProofs (proofHandles, callback) {
   callback = callback || function () {}
 
   // Validate callback is a function
-  if (!_isFunction(callback)) throw new Error('callback arg must be a function')
+  if (!_.isFunction(callback)) throw new Error('callback arg must be a function')
 
   // Validate all proofHandles provided
   if (!_.isArray(proofHandles)) throw new Error('proofHandles arg must be an Array')
@@ -498,7 +486,7 @@ function verifyProofs (proofs, uri, callback) {
   callback = callback || function () {}
 
   // Validate callback is a function
-  if (!_isFunction(callback)) throw new Error('callback arg must be a function')
+  if (!_.isFunction(callback)) throw new Error('callback arg must be a function')
 
   // Validate proofs arg
   if (!_.isArray(proofs)) throw new Error('proofs arg must be an Array')
