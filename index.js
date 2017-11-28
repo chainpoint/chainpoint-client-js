@@ -466,7 +466,7 @@ function getProofs (proofHandles, callback) {
             let r = {}
             r.hashIDNode = proofResp.hash_id_node
             r.proof = proofResp.proof
-            r.anchoredTo = proofResp.anchors_complete
+            r.anchoredTo = proofResp.anchors_complete || []
             proofsResponse.push(r)
           })
         } catch (err) {
