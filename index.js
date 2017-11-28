@@ -465,9 +465,27 @@ function getProofs (proofHandles, callback) {
       // Perform parallel GET requests to all Nodes with proofs
       Promise.map(nodesWithGetOpts, rp, {concurrency: 25}).then(function (parsedBody) {
         // Promise.map returns an Array entry for each host it submits to.
-        let flattenedParsedBody = _.flatten(parsedBody)
-        resolve(flattenedParsedBody)
-        return callback(null, flattenedParsedBody)
+        let flatParsedBody = _.flatten(parsedBody)
+
+        let proofsResponse = []
+
+        // Map the JSON response to Object form.
+        try {
+          _.forEach(flatParsedBody, proofResp => {
+            // console.log(JSON.stringify(proofResp))
+            let r = {}
+            r.hashIDNode = proofResp.hash_id_node
+            r.proof = proofResp.proof
+            r.anchoredTo = proofResp.anchors_complete
+            proofsResponse.push(r)
+          })
+        } catch (err) {
+          reject(err)
+          return callback(err)
+        }
+
+        resolve(proofsResponse)
+        return callback(null, proofsResponse)
       }, function (err) {
         reject(err)
         return callback(err)
