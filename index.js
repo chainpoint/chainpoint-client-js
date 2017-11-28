@@ -176,7 +176,7 @@ function _isValidProofHandle (handle) {
   if (!_.isEmpty(handle) &&
       _.isObject(handle) &&
       _.has(handle, 'uri') &&
-      _.has(handle, 'hashIDNode')) {
+      _.has(handle, 'hashIdNode')) {
     return true
   }
 }
@@ -211,7 +211,7 @@ function _isFunction (param) {
  * getProofs function.
  *
  * @param {Array} respArray - An Array of responses, one for each Node submitted to
- * @returns {Array<{uri: String, hash: String, hashIDNode: String}>} An Array of proofHandles
+ * @returns {Array<{uri: String, hash: String, hashIdNode: String}>} An Array of proofHandles
  */
 function _mapSubmitHashesRespToProofHandles (respArray) {
   if (!_.isArray(respArray)) throw new Error('_mapSubmitHashesRespToProofHandles arg must be an Array')
@@ -223,7 +223,7 @@ function _mapSubmitHashesRespToProofHandles (respArray) {
       let handle = {}
       handle.uri = resp.meta.submitted_to
       handle.hash = hash.hash
-      handle.hashIDNode = hash.hash_id_node
+      handle.hashIdNode = hash.hash_id_node
       proofHandles.push(handle)
     })
   })
@@ -315,7 +315,7 @@ function _flattenProofs (parsedProofs) {
  * Submit hash(es) to one or more Nodes, returning an Array of proof handle objects, one for each submitted hash and Node combination.
  * @param {Array<String>} hashes - An Array of String Hashes in Hexadecimal form.
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
- * @return {Array<{uri: String, hash: String, hashIDNode: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
+ * @return {Array<{uri: String, hash: String, hashIdNode: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
  */
 function submitHashes (hashes, uris, callback) {
   uris = uris || []
@@ -401,9 +401,9 @@ function submitHashes (hashes, uris, callback) {
  * The output of `submitProofs()` can be passed directly as the `proofHandles` arg to
  * this function.
  *
- * @param {Array<{uri: String, hashIDNode: String}>} proofHandles - An Array of Objects, each Object containing all info needed to retrieve a proof from a specific Node.
+ * @param {Array<{uri: String, hashIdNode: String}>} proofHandles - An Array of Objects, each Object containing all info needed to retrieve a proof from a specific Node.
  * @param {function} callback - An optional callback function.
- * @return {Array<{uri: String, hashIDNode: String, proof: String}>} - An Array of Objects, each returning the URI the proof was returned from and the Proof in Base64 encoded binary form.
+ * @return {Array<{uri: String, hashIdNode: String, proof: String}>} - An Array of Objects, each returning the URI the proof was returned from and the Proof in Base64 encoded binary form.
  */
 function getProofs (proofHandles, callback) {
   callback = callback || function () {}
@@ -420,9 +420,9 @@ function getProofs (proofHandles, callback) {
   let badHandleURIs = _.reject(proofHandles, function (u) { return _isValidNodeURI(u.uri) })
   if (!_.isEmpty(badHandleURIs)) throw new Error(`some proof handles contain invalid URI values : ${(_.map(badHandleURIs, h => { return h.uri })).join(', ')}`)
 
-  // Validate that *all* hashIDNode's provided are valid or throw
-  let badHandleUUIDs = _.reject(proofHandles, function (u) { return _isValidUUID(u.hashIDNode) })
-  if (!_.isEmpty(badHandleUUIDs)) throw new Error(`some proof handles contain invalid hashIDNode UUID values : ${(_.map(badHandleUUIDs, h => { return h.hashIDNode })).join(', ')}`)
+  // Validate that *all* hashIdNode's provided are valid or throw
+  let badHandleUUIDs = _.reject(proofHandles, function (u) { return _isValidUUID(u.hashIdNode) })
+  if (!_.isEmpty(badHandleUUIDs)) throw new Error(`some proof handles contain invalid hashIdNode UUID values : ${(_.map(badHandleUUIDs, h => { return h.hashIdNode })).join(', ')}`)
 
   return new Promise(function (resolve, reject) {
     try {
@@ -433,7 +433,7 @@ function getProofs (proofHandles, callback) {
         if (_.isEmpty(uuidsByNode[handle.uri])) {
           uuidsByNode[handle.uri] = []
         }
-        uuidsByNode[handle.uri].push(handle.hashIDNode)
+        uuidsByNode[handle.uri].push(handle.hashIdNode)
       })
 
       // For each Node construct a set of GET options including
@@ -460,14 +460,13 @@ function getProofs (proofHandles, callback) {
 
         let proofsResponse = []
 
-        // Map the JSON response to Object form.
         try {
           _.forEach(flatParsedBody, proofResp => {
-            let r = {}
-            r.hashIDNode = proofResp.hash_id_node
-            r.proof = proofResp.proof
-            r.anchoredTo = proofResp.anchors_complete || []
-            proofsResponse.push(r)
+            // Set to empty Array if unset of null
+            proofResp.anchors_complete = proofResp.anchors_complete || []
+            // Camel case object keys
+            let proofRespCamel = _.mapKeys(proofResp, (v, k) => _.camelCase(k))
+            proofsResponse.push(proofRespCamel)
           })
         } catch (err) {
           reject(err)
@@ -606,7 +605,10 @@ function verifyProofs (proofs, uri, callback) {
               flatProof.verified_at = null
             }
 
-            results.push(flatProof)
+            // Camel case object keys
+            let flatProofCamel = _.mapKeys(flatProof, (v, k) => _.camelCase(k))
+
+            results.push(flatProofCamel)
           })
 
           resolve(results)

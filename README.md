@@ -87,7 +87,7 @@ The Object will contain:
 
 `hash` : A copy of the hash that was originally submitted that will be embedded in a future proof. This allows for easier correlation between hashes submitted and the Hash ID handle needed to retrieve a proof.
 
-`hashIDNode` : The Version 1 UUID that can be used to retrieve the proof for a submitted hash from the `/proofs/:id` endpoint of the Node it was submitted to.
+`hashIdNode` : The Version 1 UUID that can be used to retrieve the proof for a submitted hash from the `/proofs/:id` endpoint of the Node it was submitted to.
 
 Example Return Value
 
@@ -96,12 +96,12 @@ Example Return Value
   {
     "uri": "http://0.0.0.0",
     "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
-    "hashIDNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34"
+    "hashIdNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34"
   },
   {
     "uri": "http://0.0.0.0",
     "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
-    "hashIDNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15"
+    "hashIdNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15"
   }
 ]
 ```
@@ -114,11 +114,11 @@ This function is used to retrieve Chainpoint proofs from the Nodes that are resp
 
 #### Arguments
 
-The `proofHandles` argument accepts an Array of Objects. Each object must have the `uri` and `hashIDNode` proprties. The argument is of the same form as the output from the `submitHashes()` function.
+The `proofHandles` argument accepts an Array of Objects. Each object must have the `uri` and `hashIdNode` proprties. The argument is of the same form as the output from the `submitHashes()` function.
 
 The `uri` property should be the base URI (e.g. `http://0.0.0.0`) of an online Node that is responsible for generating a particular proof.
 
-The `hashIDNode` property is a valid Version 1 UUID as provided by the return of the `submitHashes()` function.
+The `hashIdNode` property is a valid Version 1 UUID as provided by the return of the `submitHashes()` function.
 
 #### Return Values
 
@@ -126,26 +126,26 @@ This function will return an Array of Objects, each composed of the following pr
 
 ```javascript
 {
-    hashIDNode: "",
+    hashIdNode: "",
     proof: "",
-    anchoredTo: []
+    anchorsComplete: []
 }
 ```
 
-`hashIDNode` : The Version 1 UUID used to retrieve the proof.
+`hashIdNode` : The Version 1 UUID used to retrieve the proof.
 
 `proof` : The Base64 encoded binary form of the proof. See [https://github.com/chainpoint/chainpoint-binary](https://github.com/chainpoint/chainpoint-binary) for more information about proof formats. That library can also be used to convert from one form to another. If the proof is not yet available, or cannot be retrieved, this will be set to `null`.
 
-`anchoredTo` : An Array of Strings that indicates which blockchains the proof is anchored to at the time of retrieval. One or more of `cal` (Calendar), `btc` (Bitcoin), or `eth` (Ethereum).  If the proof is not yet available, or cannot be retrieved, this will be set to `[]` (An empty Array).
+`anchorsComplete` : An Array of Strings that indicates which blockchains the proof is anchored to at the time of retrieval. One or more of `cal` (Calendar), `btc` (Bitcoin), or `eth` (Ethereum).  If the proof is not yet available, or cannot be retrieved, this will be set to `[]` (An empty Array).
 
 Example Return Value
 
 ```javascript
 [
   {
-    "hashIDNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
+    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
     "proof": "eJytVjlvpEUQhf+CiDCu7upzopXIECERiVVdBx5psS17uMKFhBBSMmC5ViRIiJD/YcSP4c14dwHbCJAYjTTWePp1Vb2jvk++e6DnZzv/YPfL6W53cbU5Pn6ft/bq+eXbx3oq27OL8+3Z7vg9frz78MKfvPb8q8encnV6/cDExU2NMynFymIeIitVV2IpuazVZUwRcp1paNMyqSm3pq07tx/2MCdbOzk7N79+yUsPokVHxrGOUvJ+NM3mEQFwtVTGqPrz4cjVu+ud7W7nNydPZPdTptRx5CiPN6luMm3KeOs5vJ5fHuCFZu5/hl/FEuAb11k1UNZt+P3Jv4P/bl3KmZ761Wcff/1Qlj/8UeXhyf6r88uTm/99dX5x9fmjLx5ev3Koc2ubf9Pjoy/PL769OpWjXNvh8KGKw+F/7uD24U/Ptle7TaopjdIK0YbXStJWyWlpqrOZhTB5cOI+essl6mgys0ZalsGT4QBKGwtXr9J8zMyqpG1qDbzdzVdxGuhhaSsym7eeluz5D81URyXlmmstYXy7wN5mnXk8L7H2Tdo8k6O++ocO97LcYMSbmwOPvri8fiBFCqVEA8hV14DYUI9qztlbI0+9kJnXLMqTZiJqjl/nYk3x8ddpfXvDHfg86P0r3PX9Uzq39s3NrY/fvdxefXZ99HcFHuOQn5lcHt/8/ngvqD+U8tFTpayd3lXKby+8vB/I/9vUHlDBGFmhPhpFm5EbN5faWp4zTU+gfoDSkgM3RYwuvfY16mCuK6LdAZyA0hEJok3JnItkSU7TCuNdpofONZP7VA2bxGxhTrkUBIZO+ysgeKzRSllFdVTzkq1ALPsStC/nOa059F0jITiWxKzNUmorFqTaMnu9A4hGKMeg0Wfl3IarRac8tKLLngXQGCkNJUid5pxlzaiL4YTOandb7h4ZVEDxUR2moTRyQ7PIvxh1elOZLm0aIe5g0zqtuyMM0VIA9Bbgry++TiDu8EoZ987sEH8xUkTk4oXrQtZi8MySB5HwVCrelWjwGh3xOgICgR2fIcHVg6lUyhnfeMNHijRXauGodPaFkRiaDq5RUaV1doBPx1SaL1ERmzD8NB8LKFRtpi4ZA0kI+FGlFqAW1GNT3MlRzPA5Q3oUlJb6KMMxxGrFvDf0lihXL4QMgNjGsEqloT0Dl+IzL7CKbRGxpKa+tBcJnuisC+OCPMBePH1RpluvnJtk2jP+hoxUljwfKqXZEWOpgOaAVEvOAYKnGHfIvwkk32KZsvCaLGMM0Wdn92Q9eUrW0Qf5IIDWJ2NtUUApCwoKpFnm6Gn0FOgAQhIWipCKpdekKahDqgbEN9DZvZikoKijpBVgtjdIG7MsnVvRAu3rABmYGnzuQ7hifj0RepgMYu+tE5LjHhYNhKNdrlQpOriAkFZWrOJlrVdItKBqsAG7I1lYA21hJdyHyYgaC1/srRrQGJmOIOqoJGqD0dgJw9AlnpH8UdS6aZaBQvYKuoMJh3aslooNQ6tbkxh4UNA1oV2kheeaFK7Nnqz0CqQMeliljm6rYepW7sPkvAp42O+57pq5E+jBz3PB+nEEh/aEK6RULKx91wmmADZKToVC7sNEZKSMGISeMSDGkuqyzDGO3h38WaeFIvdp3YZ0M7h0wSaeG/b5zb67Pc/JaSWLPbXY3ZEI/mM0VytOw+jewsTAIBI5IWEwGjgh516QKiT3cgQrQN4LOzplAxmMR4XJlpNObvgj5sAkkX2QAVIZuwlRPByiF8l4OLsPc/XSuhZDVnKG/msg+QW6X1YFnrfVqWJBQJPR4L0oLEgBWAC893kXE/NMnoRtFE4dtVKHD1E6XD8QI5gIlRKrrQHOU6WENMVjReEORSQfd+u8vbWxWv+0tQvE0OZ/2doNVj422cnvD4t98Q==",
-    "anchoredTo": [
+    "anchorsComplete": [
       "cal",
       "btc"
     ]
