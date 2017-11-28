@@ -192,7 +192,7 @@ Example Return Value
     "anchorId": "695928",
     "expectedValue": "ff0fb5903d3b6deed2ee2ebc033813e7b0357de4af2e7b1d52784baad40a0d13",
     "verified": true,
-    "verifiedAt": "2017-11-28T19:16:01Z"
+    "verifiedAt": "2017-11-28T22:52:20Z"
   },
   {
     "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
@@ -203,9 +203,9 @@ Example Return Value
     "uri": "http://127.0.0.1/calendar/696030/data",
     "type": "btc",
     "anchorId": "496469",
-    "expectedValue": "8ba80e527d1d7c0d1825719af58ba4ba96a4ab8411a92c5555d8cdaf269f99de",
+    "expectedValue": "de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b",
     "verified": true,
-    "verifiedAt": "2017-11-28T19:16:01Z"
+    "verifiedAt": "2017-11-28T22:52:20Z"
   }
 ]
 ```

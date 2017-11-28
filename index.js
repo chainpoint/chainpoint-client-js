@@ -595,6 +595,11 @@ function verifyProofs (proofs, uri, callback) {
           let results = []
 
           _.forEach(flatProofs, flatProof => {
+            // temporary : reverse expected hash to match endianess
+            if (flatProof.type === 'btc') {
+              flatProof.expected_value = flatProof.expected_value.match(/.{2}/g).reverse().join('')
+            }
+
             if (flatProof.expected_value === hashesFound[flatProof.uri]) {
               // IT'S GOOD!
               flatProof.verified = true
