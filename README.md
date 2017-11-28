@@ -10,6 +10,22 @@ The client takes care of all aspects of communication with the distributed netwo
 
 Usage of this client library is supported in both Browser and Node.js based Javascript applications using `callback` functions, Promises (using `.then`, `.catch`), or Promises (using `async`/`await`) functional styles.
 
+## Proof Generation and Verification Overview
+
+The process of generating a proof where a hash is anchored to public blockchains takes time. It is, by its nature, an asynchronous process. All of these processes are handled by this client. Here are the steps in the process:
+
+### Submit Hash(es)
+
+This is a simple HTTP request to a Node, passing an Array of hash(es). For each hash submitted you will be returned a Version 1 UUID that you'll use for later retrieving a proof.
+
+### Get Proof(s)
+
+Proofs are anchored to one or more Blockchains. Depending on which blockchain being anchored to it takes some time. Initially all proofs are anchored to the 'Calendar' chain that every Node maintains a copy of. This takes approximately 10 seconds after hash submit until its ready. When the hash is also anchored to the Bitcoin blockchain (waiting for six confirmations) the combined Calendar and Bitcoin proof will replace the Calendar only proof. Bitcoin anchored proofs typically takes between 60 and 90 minutes to complete. It is the responsibility of the client to permanently store a copy of the proof.
+
+### Verify Proof(s)
+
+Once you have a proof you can verify that it cryptographically anchors to one or more of the public blockchains. The verification process locally calculates all of the hashing operations in the proof to re-create a Merkle root. This final value is then compared to a value stored in the public blockchain. If the two values match, the proof is proven valid. This verification process can be done at any time as long as you have a copy of the client software that processes the proofs, and a copy of the public blockchain data to compare against.
+
 ## TL;DR
 
 ```javascript
@@ -40,6 +56,8 @@ runIt()
 ## Public API
 
 The following public functions are exported from this client. In each case the `callback` argument is an optional callback function which is only needed if using the Callback style API:
+
+Additionally, the output of each function in the process has been designed so that it can be used as the input to the next with no need to manipulate the data.
 
 ### `submitHashes(hashes, uris, callback)`
 
