@@ -497,12 +497,11 @@ function getProofs (proofHandles, callback) {
   })
 }
 
-// FIXME : Allow passing in an Array of Proofs OR the output from getProofs
-
 /**
  * Verify a collection of proofs using an optionally provided Node URI
- * @param {Array} proofs - An Array of proofs to be verified. Proofs can be in any of the supported JSON-LD or Binary formats.
- * @param {String} uri - [Optional] The Node URI to submit proof(s) to for verification. If not provided a Node will be selected at random.
+ *
+ * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be verified. Proofs can be in any of the supported JSON-LD or Binary formats.
+ * @param {String} uri - [Optional] The Node URI to submit proof(s) to for verification. If not provided a Node will be selected at random. All proofs will be verified by a single Node.
  * @param {function} callback - An optional callback function.
  * @return {Array<Object>} - An Array of Objects, one for each proof submitted, with vefification info.
  */
@@ -515,6 +514,19 @@ function verifyProofs (proofs, uri, callback) {
   // Validate proofs arg
   if (!_.isArray(proofs)) throw new Error('proofs arg must be an Array')
   if (_.isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
+
+  // If any entry in the proofs Array is an Object, process
+  // it assuming the same form as the output of getProofs().
+  let normalizedProofs = _.map(proofs, proof => {
+    if (_.isObject(proof) && _.has(proof, 'proof') && _.isString(proof.proof)) {
+      // Probably result of `submitProofs()` call. Extract proof String
+      return proof.proof
+    } else if (_.isString(proof)) {
+      return proof
+    } else {
+      throw new Error('proofs arg Array has elements that are not Objects or Strings')
+    }
+  })
 
   // Validate and return an Array with a single Node URI
   // if provided or get an Array of Nodes via service discovery.
@@ -537,7 +549,7 @@ function verifyProofs (proofs, uri, callback) {
 
         // Parse and validate all provided proofs. The hash that
         // results from parsing will be used to validate the proof.
-        let parsedProofs = _parseProofs(proofs)
+        let parsedProofs = _parseProofs(normalizedProofs)
         let flatProofs = _flattenProofs(parsedProofs)
 
         // Assign all flat proofs to the same Node URI for verification
