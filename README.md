@@ -183,29 +183,29 @@ Example Return Value
 [
   {
     "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
-    "hash_id_node": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
-    "hash_id_core": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
-    "hash_submitted_node_at": "2017-11-28T05:20:48Z",
-    "hash_submitted_core_at": "2017-11-28T05:20:48Z",
-    "uri": "http://127.0.0,1/calendar/695928/hash",
+    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
+    "hashIdCore": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
+    "hashSubmittedNodeAt": "2017-11-28T05:20:48Z",
+    "hashSubmittedCoreAt": "2017-11-28T05:20:48Z",
+    "uri": "http://127.0.0.1/calendar/695928/hash",
     "type": "cal",
-    "anchor_id": "695928",
-    "expected_value": "ff0fb5903d3b6deed2ee2ebc033813e7b0357de4af2e7b1d52784baad40a0d13",
+    "anchorId": "695928",
+    "expectedValue": "ff0fb5903d3b6deed2ee2ebc033813e7b0357de4af2e7b1d52784baad40a0d13",
     "verified": true,
-    "verified_at": "2017-11-28T06:55:45Z"
+    "verifiedAt": "2017-11-28T19:16:01Z"
   },
   {
     "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
-    "hash_id_node": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
-    "hash_id_core": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
-    "hash_submitted_node_at": "2017-11-28T05:20:48Z",
-    "hash_submitted_core_at": "2017-11-28T05:20:48Z",
+    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
+    "hashIdCore": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
+    "hashSubmittedNodeAt": "2017-11-28T05:20:48Z",
+    "hashSubmittedCoreAt": "2017-11-28T05:20:48Z",
     "uri": "http://127.0.0.1/calendar/696030/data",
     "type": "btc",
-    "anchor_id": "496469",
-    "expected_value": "8ba80e527d1d7c0d1825719af58ba4ba96a4ab8411a92c5555d8cdaf269f99de",
+    "anchorId": "496469",
+    "expectedValue": "8ba80e527d1d7c0d1825719af58ba4ba96a4ab8411a92c5555d8cdaf269f99de",
     "verified": true,
-    "verified_at": "2017-11-28T06:55:45Z"
+    "verifiedAt": "2017-11-28T19:16:01Z"
   }
 ]
 ```
