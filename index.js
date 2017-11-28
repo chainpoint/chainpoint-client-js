@@ -234,13 +234,13 @@ function _parseProofs (proofs) {
   _.forEach(proofs, proof => {
     if (_.isObject(proof)) {
       // OBJECT
-      parsedProofs.push(cpp.parseObjectSync(proof))
+      parsedProofs.push(cpp.parseObject(proof))
     } else if (validator.isJSON(proof)) {
       // JSON-LD
-      parsedProofs.push(cpp.parseObjectSync(JSON.parse(proof)))
+      parsedProofs.push(cpp.parseObject(JSON.parse(proof)))
     } else if (validator.isBase64(proof) || _.isBuffer(proof) || _.isHex(proof)) {
       // BINARY
-      parsedProofs.push(cpp.parseBinarySync(proof))
+      parsedProofs.push(cpp.parseBinary(proof))
     } else {
       throw new Error('unknown proof format')
     }
@@ -587,11 +587,6 @@ function verifyProofs (proofs, uri, callback) {
           let results = []
 
           _.forEach(flatProofs, flatProof => {
-            // temporary : reverse expected hash to match endianess
-            if (flatProof.type === 'btc') {
-              flatProof.expected_value = flatProof.expected_value.match(/.{2}/g).reverse().join('')
-            }
-
             if (flatProof.expected_value === hashesFound[flatProof.uri]) {
               // IT'S GOOD!
               flatProof.verified = true
