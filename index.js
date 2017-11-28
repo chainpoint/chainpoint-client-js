@@ -316,11 +316,13 @@ function submitHashes (hashes, uris, callback) {
   // Validate all hashes provided
   if (!_.isArray(hashes)) throw new Error('hashes arg must be an Array')
   if (_.isEmpty(hashes)) throw new Error('hashes arg must be a non-empty Array')
+  if (hashes.length > 250) throw new Error('hashes arg must be an Array with <= 250 elements')
   let rejects = _.reject(hashes, function (h) { return _isHex(h) })
   if (!_.isEmpty(rejects)) throw new Error(`hashes arg contains invalid hashes : ${rejects.join(', ')}`)
 
   // Validate all Node URIs provided
   if (!_.isArray(uris)) throw new Error('uris arg must be an Array of String URIs')
+  if (uris.length > 5) throw new Error('uris arg must be an Array with <= 5 elements')
 
   if (_.isEmpty(uris)) {
     // get a list of nodes via service discovery
@@ -403,6 +405,7 @@ function getProofs (proofHandles, callback) {
   if (!_.isArray(proofHandles)) throw new Error('proofHandles arg must be an Array')
   if (_.isEmpty(proofHandles)) throw new Error('proofHandles arg must be a non-empty Array')
   if (!_.every(proofHandles, h => { return _isValidProofHandle(h) })) throw new Error('proofHandles Array contains invalid Objects')
+  if (proofHandles.length > 250) throw new Error('proofHandles arg must be an Array with <= 250 elements')
 
   // Validate that *all* URI's provided are valid or throw
   let badHandleURIs = _.reject(proofHandles, function (u) { return _isValidNodeURI(u.uri) })
@@ -491,6 +494,7 @@ function verifyProofs (proofs, uri, callback) {
   // Validate proofs arg
   if (!_.isArray(proofs)) throw new Error('proofs arg must be an Array')
   if (_.isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
+  if (proofs.length > 250) throw new Error('proofs arg must be an Array with <= 250 elements')
 
   // If any entry in the proofs Array is an Object, process
   // it assuming the same form as the output of getProofs().
