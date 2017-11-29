@@ -165,7 +165,9 @@ The `proofs` argument accepts an Array of Strings or Objects.
 
 If a String, it is expected to be a Chainpoint 3.0 proof in either Base64 encoded binary, or JSON-LD form.
 
-If an Object it must have at least a `proof` property containing a String as described above.
+If an Object it can be a Chainpoint 3.0 proof as an Object, or have a `proof` property containing a String proof as described above as is created by the output of `getProofs()`.
+
+Proof types can be mixed freely in the `proofs` arg Array.
 
 The `uri` property should be the base URI (e.g. `http://0.0.0.0`) of an online Node that will be responsible for providing a hash value from the Calendar block specified in the proof. The hash value provided will then be compared to the result of calculating all of the operations in the proof locally. If the locally calculated values matches the server provided value it verifies that the proof is valid.
 
