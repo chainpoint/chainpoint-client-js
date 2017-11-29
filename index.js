@@ -502,7 +502,11 @@ function verifyProofs (proofs, uri, callback) {
     if (_.isObject(proof) && _.has(proof, 'proof') && _.isString(proof.proof)) {
       // Probably result of `submitProofs()` call. Extract proof String
       return proof.proof
-    } else if (_.isString(proof)) {
+    } else if (_.isObject(proof) && _.has(proof, 'type') && proof.type === 'Chainpoint') {
+      // Probably a JS Object Proof
+      return proof
+    } else if (_.isString(proof) && (validator.isJSON(proof) || validator.isBase64(proof))) {
+      // Probably a JSON String or Base64 encoded binary proof
       return proof
     } else {
       throw new Error('proofs arg Array has elements that are not Objects or Strings')
