@@ -234,13 +234,13 @@ function _parseProofs (proofs) {
   _.forEach(proofs, proof => {
     if (_.isObject(proof)) {
       // OBJECT
-      parsedProofs.push(cpp.parseObject(proof))
+      parsedProofs.push(cpp.parse(proof))
     } else if (validator.isJSON(proof)) {
       // JSON-LD
-      parsedProofs.push(cpp.parseObject(JSON.parse(proof)))
+      parsedProofs.push(cpp.parse(JSON.parse(proof)))
     } else if (validator.isBase64(proof) || _.isBuffer(proof) || _.isHex(proof)) {
       // BINARY
-      parsedProofs.push(cpp.parseBinary(proof))
+      parsedProofs.push(cpp.parse(proof))
     } else {
       throw new Error('unknown proof format')
     }
