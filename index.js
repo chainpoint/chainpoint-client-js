@@ -272,39 +272,51 @@ function _flattenProofs (parsedProofs) {
   let flatProofAnchors = []
 
   _.forEach(parsedProofs, parsedProof => {
-    _.forEach(parsedProof.branches, parsedProofTopBranch => {
-      _.forEach(parsedProofTopBranch.anchors, topBranchAnchor => {
-        let flatAnchor = {}
-        flatAnchor.hash = parsedProof.hash
-        flatAnchor.hash_id_node = parsedProof.hash_id_node
-        flatAnchor.hash_id_core = parsedProof.hash_id_core
-        flatAnchor.hash_submitted_node_at = parsedProof.hash_submitted_node_at
-        flatAnchor.hash_submitted_core_at = parsedProof.hash_submitted_core_at
-        flatAnchor.uri = topBranchAnchor.uris[0]
-        flatAnchor.type = topBranchAnchor.type
-        flatAnchor.anchor_id = topBranchAnchor.anchor_id
-        flatAnchor.expected_value = topBranchAnchor.expected_value
-        flatProofAnchors.push(flatAnchor)
-      })
-
-      _.forEach(parsedProofTopBranch.branches, parsedProofSubBranch => {
-        _.forEach(parsedProofSubBranch.anchors, subBranchAnchor => {
-          let flatInnerAnchor = {}
-          flatInnerAnchor.hash = parsedProof.hash
-          flatInnerAnchor.hash_id_node = parsedProof.hash_id_node
-          flatInnerAnchor.hash_id_core = parsedProof.hash_id_core
-          flatInnerAnchor.hash_submitted_node_at = parsedProof.hash_submitted_node_at
-          flatInnerAnchor.hash_submitted_core_at = parsedProof.hash_submitted_core_at
-          flatInnerAnchor.uri = subBranchAnchor.uris[0]
-          flatInnerAnchor.type = subBranchAnchor.type
-          flatInnerAnchor.anchor_id = subBranchAnchor.anchor_id
-          flatInnerAnchor.expected_value = subBranchAnchor.expected_value
-          flatProofAnchors.push(flatInnerAnchor)
-        })
-      })
+    let proofAnchors = _flattenProofBranches(parsedProof.branches)
+    _.forEach(proofAnchors, proofAnchor => {
+      let flatProofAnchor = {}
+      flatProofAnchor.hash = parsedProof.hash
+      flatProofAnchor.hash_id_node = parsedProof.hash_id_node
+      flatProofAnchor.hash_id_core = parsedProof.hash_id_core
+      flatProofAnchor.hash_submitted_node_at = parsedProof.hash_submitted_node_at
+      flatProofAnchor.hash_submitted_core_at = parsedProof.hash_submitted_core_at
+      flatProofAnchor.branch = proofAnchor.branch
+      flatProofAnchor.uri = proofAnchor.uri
+      flatProofAnchor.type = proofAnchor.type
+      flatProofAnchor.anchor_id = proofAnchor.anchor_id
+      flatProofAnchor.expected_value = proofAnchor.expected_value
+      flatProofAnchors.push(flatProofAnchor)
     })
   })
 
+  return flatProofAnchors
+}
+
+/**
+ * Flatten an Array of proof branches where each proof anchor in
+ * each branch is represented as an Object with all relevant data for that anchor.
+ *
+ * @param {Array} proofBranchArray - An Array of branches for a given level in a proof
+ * @returns {Array} An Array of flattened proof anchor objects for each branch
+ */
+function _flattenProofBranches (proofBranchArray) {
+  let flatProofAnchors = []
+
+  _.forEach(proofBranchArray, proofBranch => {
+    let anchors = proofBranch.anchors
+    _.forEach(anchors, anchor => {
+      let flatAnchor = {}
+      flatAnchor.branch = proofBranch.label || undefined
+      flatAnchor.uri = anchor.uris[0]
+      flatAnchor.type = anchor.type
+      flatAnchor.anchor_id = anchor.anchor_id
+      flatAnchor.expected_value = anchor.expected_value
+      flatProofAnchors.push(flatAnchor)
+    })
+    if (proofBranch.branches) {
+      flatProofAnchors = flatProofAnchors.concat(_flattenProofBranches(proofBranch.branches))
+    }
+  })
   return flatProofAnchors
 }
 

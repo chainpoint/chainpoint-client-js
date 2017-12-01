@@ -2,9 +2,12 @@
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
+[![npm](https://img.shields.io/npm/l/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
+[![npm](https://img.shields.io/npm/v/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
+
 ## About
 
-A client for creating and verifying [Chainpoint](https://chainpoint.org) proofs using the [Tierion](http://tierion.com) Network.
+A client for creating and verifying [Chainpoint](https://chainpoint.org) proofs using the [Tierion](https://tierion.com) Network.
 
 The Chainpoint Client handles communication with a distributed network of Nodes that make up the Tierion Network.
 
@@ -28,7 +31,7 @@ Proofs are first anchored to the 'Calendar' chain maintained by every Node. This
 
 Proofs are appended with data as they are anchored to additional blockchains. For example, it takes 60 - 90 minutes to anchor a proof to Bitcoin. Calling getProofs will now append the first proof with data that anchors it to the Bitcoin Blockchain.
 
-Nodes retain proofs for 24 hours. Each client must retrive and permanently store each Chainpoint proof.
+Nodes retain proofs for 24 hours. Each client must retrieve and permanently store each Chainpoint proof.
 
 ### Verify Proof(s)
 

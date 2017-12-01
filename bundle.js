@@ -273,39 +273,51 @@ function _flattenProofs (parsedProofs) {
   let flatProofAnchors = []
 
   _.forEach(parsedProofs, parsedProof => {
-    _.forEach(parsedProof.branches, parsedProofTopBranch => {
-      _.forEach(parsedProofTopBranch.anchors, topBranchAnchor => {
-        let flatAnchor = {}
-        flatAnchor.hash = parsedProof.hash
-        flatAnchor.hash_id_node = parsedProof.hash_id_node
-        flatAnchor.hash_id_core = parsedProof.hash_id_core
-        flatAnchor.hash_submitted_node_at = parsedProof.hash_submitted_node_at
-        flatAnchor.hash_submitted_core_at = parsedProof.hash_submitted_core_at
-        flatAnchor.uri = topBranchAnchor.uris[0]
-        flatAnchor.type = topBranchAnchor.type
-        flatAnchor.anchor_id = topBranchAnchor.anchor_id
-        flatAnchor.expected_value = topBranchAnchor.expected_value
-        flatProofAnchors.push(flatAnchor)
-      })
-
-      _.forEach(parsedProofTopBranch.branches, parsedProofSubBranch => {
-        _.forEach(parsedProofSubBranch.anchors, subBranchAnchor => {
-          let flatInnerAnchor = {}
-          flatInnerAnchor.hash = parsedProof.hash
-          flatInnerAnchor.hash_id_node = parsedProof.hash_id_node
-          flatInnerAnchor.hash_id_core = parsedProof.hash_id_core
-          flatInnerAnchor.hash_submitted_node_at = parsedProof.hash_submitted_node_at
-          flatInnerAnchor.hash_submitted_core_at = parsedProof.hash_submitted_core_at
-          flatInnerAnchor.uri = subBranchAnchor.uris[0]
-          flatInnerAnchor.type = subBranchAnchor.type
-          flatInnerAnchor.anchor_id = subBranchAnchor.anchor_id
-          flatInnerAnchor.expected_value = subBranchAnchor.expected_value
-          flatProofAnchors.push(flatInnerAnchor)
-        })
-      })
+    let proofAnchors = _flattenProofBranches(parsedProof.branches)
+    _.forEach(proofAnchors, proofAnchor => {
+      let flatProofAnchor = {}
+      flatProofAnchor.hash = parsedProof.hash
+      flatProofAnchor.hash_id_node = parsedProof.hash_id_node
+      flatProofAnchor.hash_id_core = parsedProof.hash_id_core
+      flatProofAnchor.hash_submitted_node_at = parsedProof.hash_submitted_node_at
+      flatProofAnchor.hash_submitted_core_at = parsedProof.hash_submitted_core_at
+      flatProofAnchor.branch = proofAnchor.branch
+      flatProofAnchor.uri = proofAnchor.uri
+      flatProofAnchor.type = proofAnchor.type
+      flatProofAnchor.anchor_id = proofAnchor.anchor_id
+      flatProofAnchor.expected_value = proofAnchor.expected_value
+      flatProofAnchors.push(flatProofAnchor)
     })
   })
 
+  return flatProofAnchors
+}
+
+/**
+ * Flatten an Array of proof branches where each proof anchor in
+ * each branch is represented as an Object with all relevant data for that anchor.
+ *
+ * @param {Array} proofBranchArray - An Array of branches for a given level in a proof
+ * @returns {Array} An Array of flattened proof anchor objects for each branch
+ */
+function _flattenProofBranches (proofBranchArray) {
+  let flatProofAnchors = []
+
+  _.forEach(proofBranchArray, proofBranch => {
+    let anchors = proofBranch.anchors
+    _.forEach(anchors, anchor => {
+      let flatAnchor = {}
+      flatAnchor.branch = proofBranch.label || undefined
+      flatAnchor.uri = anchor.uris[0]
+      flatAnchor.type = anchor.type
+      flatAnchor.anchor_id = anchor.anchor_id
+      flatAnchor.expected_value = anchor.expected_value
+      flatProofAnchors.push(flatAnchor)
+    })
+    if (proofBranch.branches) {
+      flatProofAnchors = flatProofAnchors.concat(_flattenProofBranches(proofBranch.branches))
+    }
+  })
   return flatProofAnchors
 }
 
@@ -24501,10 +24513,34 @@ const sha3224 = require('js-sha3').sha3_224
 const chpSchema = require('chainpoint-proof-json-schema')
 const chpBinary = require('chainpoint-binary')
 
-function parse (chainpointObject, callback) {
-  // if the supplied is a Buffer, Hex, or Base64 string, convert to JS object
-  if (typeof chainpointObject === 'string' || Buffer.isBuffer(chainpointObject)) chainpointObject = chpBinary.binaryToObjectSync(chainpointObject)
+exports.parseObject = (chainpointObject, callback) => {
+  let schemaCheck = chpSchema.validate(chainpointObject)
+  if (!schemaCheck.valid) return callback(schemaCheck.errors)
 
+  // initialize the result object
+  let result = {}
+  // identify this result set with the basic information on the hash
+  result.hash = chainpointObject.hash
+  result.hash_id_node = chainpointObject.hash_id_node
+  result.hash_submitted_node_at = chainpointObject.hash_submitted_node_at
+  result.hash_id_core = chainpointObject.hash_id_core
+  result.hash_submitted_core_at = chainpointObject.hash_submitted_core_at
+  // acquire all anchor points and calcaulte expected values for all branches, recursively
+  result.branches = parseBranches(chainpointObject.hash, chainpointObject.branches)
+  return callback(null, result)
+}
+
+exports.parseBinary = (chainpointBinary, callback) => {
+  let proofObject
+  try {
+    proofObject = chpBinary.binaryToObjectSync(chainpointBinary)
+  } catch (error) {
+    return callback(error)
+  }
+  return this.parseObject(proofObject, callback)
+}
+
+exports.parseObjectSync = (chainpointObject) => {
   let schemaCheck = chpSchema.validate(chainpointObject)
   if (!schemaCheck.valid) throw new Error(schemaCheck.errors)
 
@@ -24519,6 +24555,11 @@ function parse (chainpointObject, callback) {
   // acquire all anchor points and calcaulte expected values for all branches, recursively
   result.branches = parseBranches(chainpointObject.hash, chainpointObject.branches)
   return result
+}
+
+exports.parseBinarySync = (chainpointBinary) => {
+  let proofObject = chpBinary.binaryToObjectSync(chainpointBinary)
+  return this.parseObjectSync(proofObject)
 }
 
 function parseBranches (startHash, branchArray) {
@@ -24590,19 +24631,12 @@ function parseBranches (startHash, branchArray) {
 function parseAnchors (currentHashValue, anchorsArray) {
   var anchors = []
   for (var x = 0; x < anchorsArray.length; x++) {
-    let expectedValue = currentHashValue.toString('hex')
-    // BTC merkle root values is in little endian byte order
-    // All hashes and calculations in a Chainpoint proof are in big endian byte order
-    // If we are determining the expected value for a BTC anchor, the expected value
-    // result byte order must be reversed to match the BTC merkle root byte order
-    // before making any comparisons
-    if (anchorsArray[x].type === 'btc') expectedValue = expectedValue.match(/.{2}/g).reverse().join('')
     anchors.push(
       {
         type: anchorsArray[x].type,
         anchor_id: anchorsArray[x].anchor_id,
         uris: anchorsArray[x].uris || undefined,
-        expected_value: expectedValue
+        expected_value: currentHashValue.toString('hex')
       }
     )
   }
@@ -24614,10 +24648,6 @@ function isHex (value) {
   var result = hexRegex.test(value)
   if (result) result = !(value.length % 2)
   return result
-}
-
-module.exports = {
-  parse: parse
 }
 
 }).call(this,require("buffer").Buffer)
