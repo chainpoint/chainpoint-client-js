@@ -2,6 +2,9 @@
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
+[![npm](https://img.shields.io/npm/l/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
+[![npm](https://img.shields.io/npm/v/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
+
 ## About
 
 A client for creating and verifying [Chainpoint](https://chainpoint.org) proofs using the [Tierion](https://tierion.com) Network.
