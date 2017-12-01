@@ -4,27 +4,35 @@
 
 ## About
 
-This client provides an easy-to-use interface for submitting hashes, and downloading and verifying [Chainpoint](https://chainpoint.org) proofs from the [Tierion](https://tierion.com) Network.
+A client for creating and verifying [Chainpoint](https://chainpoint.org) proofs using the [Tierion](http://tierion.com) Network.
 
-The client takes care of all aspects of communication with the distributed network of Nodes that make up the Tierion Network and returns simple data structures that are easy to consume.
+The Chainpoint Client handles communication with a distributed network of Nodes that make up the Tierion Network.
 
-Usage of this client library is supported in both Browser and Node.js based Javascript applications using `callback` functions, Promises (using `.then`, `.catch`), or Promises (using `async`/`await`) functional styles.
+The Chainpoint Client lets you submit hashes to a Chainpoint Node on the Tierion Network. Nodes periodically aggregate hashes and send data to Tierion Core for anchoring the hash to public blockchains.
 
-## Proof Generation and Verification Overview
+The Chainpoint Client lets you retrieve and verify a Chainpoint proof. Each proof cryptographically proves the integrity and existence of data at a point in time.
 
-The process of generating a proof where a hash is anchored to public blockchains takes time. It is, by its nature, an asynchronous process. All of these processes are handled by this client. Here are the steps in the process:
+This client can be used in both Browser and Node.js based Javascript applications using `callback` functions, Promises (using `.then`, `.catch`), or Promises (using `async`/`await`) functional styles.
+
+## Proof Creation and Verification Overview
+
+Creating a Chainpoint proof is an asynchronous process. This client handles all the steps for submitting hashes, retreiving proofs, and verifying proofs.
 
 ### Submit Hash(es)
 
-This is a simple HTTP request to a Node, passing an Array of hash(es). For each hash submitted you will be returned a Version 1 UUID that you'll use for later retrieving a proof.
+This is an HTTP request that passes an Array of hash(es) to a Node. The Node will return a Version 1 UUID for each hash submitted. This `hashidNode` is used later for retrieving a proof.
 
 ### Get Proof(s)
 
-Proofs are anchored to one or more Blockchains. Depending on which blockchain being anchored to it takes some time. Initially all proofs are anchored to the 'Calendar' chain that every Node maintains a copy of. This takes approximately 10 seconds after hash submit until its ready. When the hash is also anchored to the Bitcoin blockchain (waiting for six confirmations) the combined Calendar and Bitcoin proof will replace the Calendar only proof. Bitcoin anchored proofs typically takes between 60 and 90 minutes to complete. It is the responsibility of the client to permanently store a copy of the proof.
+Proofs are first anchored to the 'Calendar' chain maintained by every Node. This takes up to ten seconds. Retrieving a `hashIdNode` at this stage returns a proof anchored to the Calendar.
+
+Proofs are appended with data as they are anchored to additional blockchains. For example, it takes 60 - 90 minutes to anchor a proof to Bitcoin. Calling getProofs will now append the first proof with data that anchors it to the Bitcoin Blockchain.
+
+Nodes retain proofs for 24 hours. Each client must retrive and permanently store each Chainpoint proof.
 
 ### Verify Proof(s)
 
-Once you have a proof you can verify that it cryptographically anchors to one or more of the public blockchains. The verification process locally calculates all of the hashing operations in the proof to re-create a Merkle root. This final value is then compared to a value stored in the public blockchain. If the two values match, the proof is proven valid. This verification process can be done at any time as long as you have a copy of the client software that processes the proofs, and a copy of the public blockchain data to compare against.
+Anyone with a Chainpoint proof can verify that it cryptographically anchors to one or more of the public blockchains. The verification process performs the operations in the proof to re-create a Merkle root. This value is compared to a Merkle root stored in the public blockchain. If the values match, the proof is valid. 
 
 ## TL;DR
 
