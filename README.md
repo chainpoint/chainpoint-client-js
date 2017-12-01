@@ -28,7 +28,7 @@ Proofs are first anchored to the 'Calendar' chain maintained by every Node. This
 
 Proofs are appended with data as they are anchored to additional blockchains. For example, it takes 60 - 90 minutes to anchor a proof to Bitcoin. Calling getProofs will now append the first proof with data that anchors it to the Bitcoin Blockchain.
 
-Nodes retain proofs for 24 hours. Each client must retrive and permanently store each Chainpoint proof.
+Nodes retain proofs for 24 hours. Each client must retrieve and permanently store each Chainpoint proof.
 
 ### Verify Proof(s)
 
