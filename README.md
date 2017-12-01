@@ -4,7 +4,7 @@
 
 ## About
 
-A client for creating and verifying [Chainpoint](https://chainpoint.org) proofs using the [Tierion](http://tierion.com) Network.
+A client for creating and verifying [Chainpoint](https://chainpoint.org) proofs using the [Tierion](https://tierion.com) Network.
 
 The Chainpoint Client handles communication with a distributed network of Nodes that make up the Tierion Network.
 
