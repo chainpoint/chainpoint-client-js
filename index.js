@@ -58,32 +58,41 @@ function getCores (num, callback) {
   if (!_.isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
 
   return new Promise(function (resolve, reject) {
-    dns.resolveTxt(DNS_CORE_DISCOVERY_ADDR, (err, records) => {
-      if (err) {
-        reject(err)
-        return callback(err)
-      }
+    if (dns && _.isFunction(dns.resolveTxt)) {
+      dns.resolveTxt(DNS_CORE_DISCOVERY_ADDR, (err, records) => {
+        if (err) {
+          reject(err)
+          return callback(err)
+        }
 
-      if (_.isEmpty(records)) {
-        let err = new Error('no core addresses available')
-        reject(err)
-        return callback(err)
-      }
+        if (_.isEmpty(records)) {
+          let err = new Error('no core addresses available')
+          reject(err)
+          return callback(err)
+        }
 
-      let cores = _.map(records, coreIP => {
-        return 'https://' + coreIP
+        let cores = _.map(records, coreIP => {
+          return 'https://' + coreIP
+        })
+
+        // randomize the order
+        let shuffledCores = _.shuffle(cores)
+        // only return cores with valid addresses (should be all)
+        let filteredCores = _.filter(shuffledCores, function (c) { return _isValidCoreURI(c) })
+        // only return num cores
+        let slicedCores = _.slice(filteredCores, 0, num)
+
+        resolve(slicedCores)
+        return callback(null, slicedCores)
       })
-
-      // randomize the order
-      let shuffledCores = _.shuffle(cores)
-      // only return cores with valid addresses (should be all)
-      let filteredCores = _.filter(shuffledCores, function (c) { return _isValidCoreURI(c) })
-      // only return num cores
-      let slicedCores = _.slice(filteredCores, 0, num)
-
+    } else {
+      // `dns` module is not available in the browser
+      // fallback to simple random selection of Cores
+      let cores = ['https://a.chainpoint.org', 'https://b.chainpoint.org', 'https://c.chainpoint.org']
+      let slicedCores = _.slice(_.shuffle(cores), 0, num)
       resolve(slicedCores)
       return callback(null, slicedCores)
-    })
+    }
   })
 }
 

@@ -314,7 +314,7 @@ runIt()
 Note : You can copy `bundle.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
 
 ```html
-  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client/CURRENT-PROJECT-SHA1-HERE/bundle.js"></script>
+  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/CURRENT-PROJECT-SHA1-HERE/bundle.js"></script>
 
 ```
 

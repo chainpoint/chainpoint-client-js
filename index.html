@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Chainpoint Client Sample Code</title>
+</head>
+
+<body>
+    <h2>Chainpoint Client Sample Code</h2>
+
+    <p>This is a very simple demonstration app that uses the <a href="https://github.com/chainpoint/chainpoint-client-js">Chainpoint Client library for Javascript</a>.</p>
+    <p>Provide a list of SHA-256 hashes (comma separated) and click submit to generate and verify Chainpoint proofs for each.</p>
+
+    <textarea id="hashes" cols="67" rows="5"></textarea>
+    <br>
+    <input type="button" id="submitBtn" value="Submit Hash">
+
+    <br>
+
+    <h3>submitHashes()</h3>
+    <small>Returns an Array of Objects, includes a Hash ID (UUID) for each Hash/Node combination.</small>
+    <pre><code><span id="proofHandles"></span></code></pre>
+
+    <h3>getProofs() [after 12 second delay]</h3>
+    <small>Returns an Array of Objects, one for each proof that has been generated. Proofs are in Base64 encoded compressed binary form.</small>
+    <pre><code><span id="proofObjects"></span></code></pre>
+
+    <h3>verifyProofs()</h3>
+    <small>Returns an Array of Objects, one for each proof anchor indicating its verification status.</small>
+    <pre><code><span id="verifiedProofs"></span></code></pre>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="bundle.js"></script>
+    <script>
+        // sleep time milliseconds
+        function sleep(time) {
+            return new Promise((resolve) => setTimeout(resolve, time));
+        }
+
+        $('#hashes').val(['1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+                          '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+                          '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'].join(','))
+
+        $('#submitBtn').click(event => {
+            $('#proofHandles').empty()
+            $('#proofObjects').empty()
+            $('#verifiedProofs').empty()
+
+            let hashes = $('#hashes').val().split(',')
+            let trimmedHashes = hashes.map(str => str.trim())
+
+            let nodes = ['http://35.188.224.112',
+                         'http://35.186.176.183',
+                         'http://35.188.230.126']
+
+            return chainpointClient.submitHashes(trimmedHashes, nodes).then(proofHandles => {
+                console.log(JSON.stringify(proofHandles, null, 2))
+                $('#proofHandles').html(JSON.stringify(proofHandles, null, 2))
+
+                // wait until a Calendar proof has been generated
+                sleep(12000).then(() => {
+                    chainpointClient.getProofs(proofHandles).then(proofObjects => {
+                        console.log(JSON.stringify(proofObjects, null, 2))
+                        $('#proofObjects').html(JSON.stringify(proofObjects, null, 2))
+
+                        chainpointClient.verifyProofs(proofObjects).then(verifiedProofs => {
+                            console.log(JSON.stringify(verifiedProofs, null, 2))
+                            $('#verifiedProofs').html(JSON.stringify(verifiedProofs, null, 2))
+                        }).catch(err => {
+                            console.log(err)
+                        })
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                }).catch(err => {
+                    console.log(err)
+                })
+            }).catch(err => {
+                console.log(err)
+            })
+        })
+    </script>
+</body>
+
+</html>

@@ -8,7 +8,7 @@
   "repository": "https://github.com/chainpoint/chainpoint-client-js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bundle": "./node_modules/.bin/browserify --standalone chainpointClient index.js -o docs/bundle.js",
+    "bundle": "./node_modules/.bin/browserify --standalone chainpointClient index.js -o bundle.js",
     "bundle-size": "./node_modules/.bin/browserify --list index.js | xargs ls -la | sort -r"
   },
   "keywords": [],
