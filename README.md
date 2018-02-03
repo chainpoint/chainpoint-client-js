@@ -37,6 +37,10 @@ Nodes retain proofs for 24 hours. Each client must retrieve and permanently stor
 
 Anyone with a Chainpoint proof can verify that it cryptographically anchors to one or more of the public blockchains. The verification process performs the operations in the proof to re-create a Merkle root. This value is compared to a Merkle root stored in the public blockchain. If the values match, the proof is valid. 
 
+### Evaluate Proof(s)
+
+This function is similar to the Verify function. The difference with this function is that it only calculates and returns the expected values for each anchor. This function does not verify that the expected values exist on the public blockchains. In most common cases, you will want to use Verify instead.
+
 ## TL;DR
 
 [Try It Out with RunKit](https://runkit.com/grempe/tierion-chainpoint-client-async-example)
@@ -228,6 +232,59 @@ Example Return Value
     "expectedValue": "de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b",
     "verified": true,
     "verifiedAt": "2017-11-28T22:52:20Z"
+  }
+]
+```
+
+### `evaluateProofs (proofs)`
+
+#### Description
+
+This function is used to evaluate proofs and returns then values arrived at by parsing and performing the operations in a proof.
+
+#### Arguments
+
+The `proofs` argument accepts an Array of Strings or Objects.
+
+If a String, it is expected to be a Chainpoint 3.0 proof in either Base64 encoded binary, or JSON-LD form.
+
+If an Object it can be a Chainpoint 3.0 proof as an Object, or have a `proof` property containing a String proof as described above as is created by the output of `getProofs()`.
+
+Proof types can be mixed freely in the `proofs` arg Array.
+
+This process is handled entirely offline. At no time is the proof sent over the Internet during this process (although it is safe to do so).
+
+#### Return Values
+
+This function will return an Array of Objects. Each object represents an Anchor in a proof along with all of the relevant data.
+
+For example, a single proof that is anchored to both the Chainpoint Calendar, and to the Bitcoin blockchain, will return two objects. One for each of those anchors.
+
+Example Return Value
+
+```javascript
+[
+  {
+    "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
+    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
+    "hashIdCore": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
+    "hashSubmittedNodeAt": "2017-11-28T05:20:48Z",
+    "hashSubmittedCoreAt": "2017-11-28T05:20:48Z",
+    "uri": "http://127.0.0.1/calendar/695928/hash",
+    "type": "cal",
+    "anchorId": "695928",
+    "expectedValue": "ff0fb5903d3b6deed2ee2ebc033813e7b0357de4af2e7b1d52784baad40a0d13"
+  },
+  {
+    "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
+    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
+    "hashIdCore": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
+    "hashSubmittedNodeAt": "2017-11-28T05:20:48Z",
+    "hashSubmittedCoreAt": "2017-11-28T05:20:48Z",
+    "uri": "http://127.0.0.1/calendar/696030/data",
+    "type": "btc",
+    "anchorId": "496469",
+    "expectedValue": "de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b"
   }
 ]
 ```

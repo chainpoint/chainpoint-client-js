@@ -52,7 +52,7 @@ function _isValidCoreURI (coreURI) {
  * @returns {string} - Returns either a callback or a Promise with an Array of Core URI strings.
  */
 function getCores (num, callback) {
-  callback = callback || function () {}
+  callback = callback || function () { }
   num = num || 1
 
   if (!_.isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
@@ -130,7 +130,7 @@ function _isValidNodeURI (nodeURI) {
  * @returns {Array<String>} - Returns either a callback or a Promise with an Array of Node URI strings
  */
 function getNodes (num, callback) {
-  callback = callback || function () {}
+  callback = callback || function () { }
   num = num || 3
 
   if (!_.isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
@@ -183,9 +183,9 @@ function _isHex (value) {
  */
 function _isValidProofHandle (handle) {
   if (!_.isEmpty(handle) &&
-      _.isObject(handle) &&
-      _.has(handle, 'uri') &&
-      _.has(handle, 'hashIdNode')) {
+    _.isObject(handle) &&
+    _.has(handle, 'uri') &&
+    _.has(handle, 'hashIdNode')) {
     return true
   }
 }
@@ -328,7 +328,7 @@ function _flattenProofBranches (proofBranchArray) {
  */
 function submitHashes (hashes, uris, callback) {
   uris = uris || []
-  callback = callback || function () {}
+  callback = callback || function () { }
   let nodesPromise
 
   // Validate callback is a function
@@ -380,7 +380,7 @@ function submitHashes (hashes, uris, callback) {
       })
 
       // All requests succeed in parallel or all fail.
-      Promise.map(nodesWithPostOpts, rp, {concurrency: 25}).then(parsedBody => {
+      Promise.map(nodesWithPostOpts, rp, { concurrency: 25 }).then(parsedBody => {
         // Nodes cannot be guaranteed to know what IP address they are reachable
         // at, so we need to amend each result with the Node URI it was submitted
         // to so that proofs may later be retrieved from the appropriate Node(s).
@@ -417,7 +417,7 @@ function submitHashes (hashes, uris, callback) {
  * @return {Array<{uri: String, hashIdNode: String, proof: String}>} - An Array of Objects, each returning the URI the proof was returned from and the Proof in Base64 encoded binary form.
  */
 function getProofs (proofHandles, callback) {
-  callback = callback || function () {}
+  callback = callback || function () { }
 
   // Validate callback is a function
   if (!_.isFunction(callback)) throw new Error('callback arg must be a function')
@@ -466,7 +466,7 @@ function getProofs (proofHandles, callback) {
       })
 
       // Perform parallel GET requests to all Nodes with proofs
-      Promise.map(nodesWithGetOpts, rp, {concurrency: 25}).then(function (parsedBody) {
+      Promise.map(nodesWithGetOpts, rp, { concurrency: 25 }).then(function (parsedBody) {
         // Promise.map returns an Array entry for each host it submits to.
         let flatParsedBody = _.flatten(parsedBody)
 
@@ -507,32 +507,9 @@ function getProofs (proofHandles, callback) {
  * @return {Array<Object>} - An Array of Objects, one for each proof submitted, with vefification info.
  */
 function verifyProofs (proofs, uri, callback) {
-  callback = callback || function () {}
+  callback = callback || function () { }
 
-  // Validate callback is a function
-  if (!_.isFunction(callback)) throw new Error('callback arg must be a function')
-
-  // Validate proofs arg
-  if (!_.isArray(proofs)) throw new Error('proofs arg must be an Array')
-  if (_.isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
-  if (proofs.length > 250) throw new Error('proofs arg must be an Array with <= 250 elements')
-
-  // If any entry in the proofs Array is an Object, process
-  // it assuming the same form as the output of getProofs().
-  let normalizedProofs = _.map(proofs, proof => {
-    if (_.isObject(proof) && _.has(proof, 'proof') && _.isString(proof.proof)) {
-      // Probably result of `submitProofs()` call. Extract proof String
-      return proof.proof
-    } else if (_.isObject(proof) && _.has(proof, 'type') && proof.type === 'Chainpoint') {
-      // Probably a JS Object Proof
-      return proof
-    } else if (_.isString(proof) && (validator.isJSON(proof) || validator.isBase64(proof))) {
-      // Probably a JSON String or Base64 encoded binary proof
-      return proof
-    } else {
-      throw new Error('proofs arg Array has elements that are not Objects or Strings')
-    }
-  })
+  let evaluatedProofs = evaluateProofs(proofs)
 
   // Validate and return an Array with a single Node URI
   // if provided or get an Array of Nodes via service discovery.
@@ -551,13 +528,8 @@ function verifyProofs (proofs, uri, callback) {
       nodesPromise.then((nodes) => {
         return _.first(nodes)
       }).then(node => {
-        // Parse and validate all provided proofs. The hash that
-        // results from parsing will be used to validate the proof.
-        let parsedProofs = _parseProofs(normalizedProofs)
-        let flatProofs = _flattenProofs(parsedProofs)
-
         // Assign all flat proofs to the same Node URI for verification
-        let singleNodeFlatProofs = _.map(flatProofs, proof => {
+        let singleNodeFlatProofs = _.map(evaluatedProofs, proof => {
           let oldProofURI = url.parse(proof.uri)
           proof.uri = node + oldProofURI.path
           return proof
@@ -589,7 +561,7 @@ function verifyProofs (proofs, uri, callback) {
         return [flatProofs, nodesWithGetOpts]
       }).then(([flatProofs, nodesWithGetOpts]) => {
         // Perform parallel GET requests to all Nodes with proofs
-        let hashesByNodeURI = Promise.map(nodesWithGetOpts, rp, {concurrency: 25}).then(parsedBody => {
+        let hashesByNodeURI = Promise.map(nodesWithGetOpts, rp, { concurrency: 25 }).then(parsedBody => {
           // Promise.map returns an Array entry for each host it submits to.
           let flatParsedBody = _.flatten(parsedBody)
 
@@ -642,10 +614,45 @@ function verifyProofs (proofs, uri, callback) {
   })
 }
 
+/**
+ * Evaluates the expected anchor values for a collection of proofs
+ *
+ * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be evaluated. Proofs can be in any of the supported JSON-LD or Binary formats.
+ */
+function evaluateProofs (proofs) {
+  // Validate proofs arg
+  if (!_.isArray(proofs)) throw new Error('proofs arg must be an Array')
+  if (_.isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
+  if (proofs.length > 250) throw new Error('proofs arg must be an Array with <= 250 elements')
+
+  // If any entry in the proofs Array is an Object, process
+  // it assuming the same form as the output of getProofs().
+  let normalizedProofs = _.map(proofs, proof => {
+    if (_.isObject(proof) && _.has(proof, 'proof') && _.isString(proof.proof)) {
+      // Probably result of `submitProofs()` call. Extract proof String
+      return proof.proof
+    } else if (_.isObject(proof) && _.has(proof, 'type') && proof.type === 'Chainpoint') {
+      // Probably a JS Object Proof
+      return proof
+    } else if (_.isString(proof) && (validator.isJSON(proof) || validator.isBase64(proof))) {
+      // Probably a JSON String or Base64 encoded binary proof
+      return proof
+    } else {
+      throw new Error('proofs arg Array has elements that are not Objects or Strings')
+    }
+  })
+
+  let parsedProofs = _parseProofs(normalizedProofs)
+  let flatProofs = _flattenProofs(parsedProofs)
+
+  return flatProofs
+}
+
 module.exports = {
   getCores: getCores,
   getNodes: getNodes,
   submitHashes: submitHashes,
   getProofs: getProofs,
-  verifyProofs: verifyProofs
+  verifyProofs: verifyProofs,
+  evaluateProofs: evaluateProofs
 }
