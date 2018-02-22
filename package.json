@@ -1,6 +1,6 @@
 {
   "name": "chainpoint-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Chainpoint API client",
   "main": "index.js",
   "author": "Glenn Rempe <glenn@tierion.com>",
