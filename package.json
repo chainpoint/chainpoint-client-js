@@ -8,12 +8,19 @@
   "repository": "https://github.com/chainpoint/chainpoint-client-js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack",
     "bundle": "./node_modules/.bin/browserify --standalone chainpointClient index.js -o bundle.js",
     "bundle-size": "./node_modules/.bin/browserify --list index.js | xargs ls -la | sort -r"
   },
   "keywords": [],
   "devDependencies": {
-    "browserify": "^16.1.0"
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "browserify": "^16.1.0",
+    "uglifyjs-webpack-plugin": "^1.2.0"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
@@ -23,6 +30,7 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "uuid-validate": "^0.0.2",
-    "validator": "^9.1.2"
+    "validator": "^9.1.2",
+    "webpack": "^3.11.0"
   }
 }
