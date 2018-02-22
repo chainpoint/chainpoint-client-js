@@ -240,7 +240,9 @@ Example Return Value
 
 #### Description
 
-This function is used to evaluate proofs and returns then values arrived at by parsing and performing the operations in a proof.
+This function is used to evaluate proofs and returns the values arrived at by parsing and performing the operations in a proof.
+
+For example, this can be used to easily verify that a proof that is anchored to the Bitcoin blockchain is valid, without trusting any other third party service. The only thing required is a copy of the Bitcoin block headers, available from any BTC full node or block explorer.
 
 #### Arguments
 
@@ -288,6 +290,14 @@ Example Return Value
   }
 ]
 ```
+
+In this case, you can use a block explorer to confirm that BTC block ID `496469` has a block Merkle root value (`expectedValue`) of `de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b`. If it does, that means this proof can be provably said to anchor its hash to that Bitcoin block.
+
+You can confirm this example by visiting:
+
+https://live.blockcypher.com/btc/block/000000000000000000bc3f3e0182f34c749756152373a2df89f634bcd7789017/
+
+And clicking on the `Advanced Details` button to view the block's Merkle root.
 
 ### `getCores (num, callback)`
 

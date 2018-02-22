@@ -1,6 +1,6 @@
 {
   "name": "chainpoint-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Chainpoint API client",
   "main": "index.js",
   "author": "Glenn Rempe <glenn@tierion.com>",
@@ -13,7 +13,7 @@
   },
   "keywords": [],
   "devDependencies": {
-    "browserify": "^14.3.0"
+    "browserify": "^16.1.0"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
