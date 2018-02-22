@@ -138,7 +138,7 @@ function getNodes (num, callback) {
   return new Promise(function (resolve, reject) {
     getCores(1).then(coreURI => {
       let getNodeURI = _.first(coreURI) + '/nodes/random'
-      request({ uri: getNodeURI, json: true }, (err, response, body) => {
+      request({ uri: getNodeURI, json: true, timeout: 25000 }, (err, response, body) => {
         if (err) {
           reject(err)
           return callback(err)
@@ -152,6 +152,8 @@ function getNodes (num, callback) {
         let filteredNodes = _.filter(shuffledNodes, function (n) { return _isValidNodeURI(n) })
         // only return maxNodes nodes
         let slicedNodes = _.slice(filteredNodes, 0, num)
+        // We should never return an empty array of nodes
+        if (!slicedNodes.length) throw new Error('There seems to be an issue retrieving a list of available nodes. Please try again.')
 
         resolve(slicedNodes)
         return callback(null, slicedNodes)
