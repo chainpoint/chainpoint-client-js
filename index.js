@@ -138,7 +138,7 @@ function getNodes (num, callback) {
   return new Promise(function (resolve, reject) {
     getCores(1).then(coreURI => {
       let getNodeURI = _.first(coreURI) + '/nodes/random'
-      request({ uri: getNodeURI, json: true, timeout: 5000 }, (err, response, body) => {
+      request({ uri: getNodeURI, json: true, timeout: 25000 }, (err, response, body) => {
         if (err) {
           reject(err)
           return callback(err)
