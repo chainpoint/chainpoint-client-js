@@ -13,7 +13,7 @@
   },
   "keywords": [],
   "devDependencies": {
-    "browserify": "^14.3.0"
+    "browserify": "^16.1.0"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
