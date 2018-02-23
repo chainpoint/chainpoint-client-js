@@ -5,8 +5,11 @@ module.exports = {
   target: 'node',
   entry: './index.js',
   output: {
+    path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    library: 'chainpoint-client',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   module: {
     loaders: [
