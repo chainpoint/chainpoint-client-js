@@ -398,17 +398,17 @@ runIt()
 
 ### Browser Script Tag Example
 
-Note : You can copy `bundle.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
+Note : You can copy `dist/bundle.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
 
 ```html
-  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/CURRENT-PROJECT-SHA1-HERE/bundle.js"></script>
+  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/CURRENT-PROJECT-SHA1-HERE/dist/bundle.js"></script>
 
 ```
 
 Or install the `npm` package in a place available to your web server pages and set the `script src` tag as shown in the example below. A set of window global functions (e.g. `chainpointClient.submitHashes()`) will then be available for use in a fashion similar to that shown in the examples above.
 
 ```html
-<script src="./node_modules/chainpoint-client/bundle.js">
+<script src="./node_modules/chainpoint-client/dist/bundle.js">
 ```
 
 ## License
