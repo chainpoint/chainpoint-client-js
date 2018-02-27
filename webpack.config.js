@@ -1,23 +1,8 @@
 const path = require('path')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
-module.exports = {
-  target: 'node',
-  node: {
-    dgram: 'empty',
-    fs: 'empty',
-    net: 'empty',
-    dns: 'empty',
-    tls: 'empty'
-  },
+let base = {
   entry: './index.js',
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
-    library: 'chainpoint-client',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
-  },
   module: {
     loaders: [
       {
@@ -42,3 +27,52 @@ module.exports = {
     new UglifyJSPlugin()
   ]
 }
+
+let web = {
+  node: {
+    dgram: 'empty',
+    fs: 'empty',
+    net: 'empty',
+    dns: 'empty',
+    tls: 'empty'
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
+    library: 'chainpointClient',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
+  }
+}
+
+let node = {
+  target: 'node',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.node.js',
+    library: 'chainpointClient',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
+  },
+  module: {
+    loaders: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        query: {
+          presets: [
+            ['env', {
+              targets: {
+                node: true
+              },
+              // for uglifyjs...
+              forceAllTransforms: true
+            }]
+          ]
+        }
+      }
+    ]
+  }
+}
+
+module.exports = [Object.assign({}, base, web), Object.assign({}, base, node)]
