@@ -3,6 +3,13 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
   target: 'node',
+  node: {
+    dgram: 'empty',
+    fs: 'empty',
+    net: 'empty',
+    dns: 'empty',
+    tls: 'empty'
+  },
   entry: './index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
