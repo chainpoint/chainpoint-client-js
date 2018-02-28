@@ -401,7 +401,7 @@ runIt()
 Note : You can copy `dist/bundle.web.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
 
 ```html
-  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/9b42e63f2591764954d917ae81caccc75f5c15f5/dist/bundle.web.js"></script>
+  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/9db515aa5a4380181feb287bf4ed474ed86eb010/dist/bundle.web.js"></script>
 
 ```
 
