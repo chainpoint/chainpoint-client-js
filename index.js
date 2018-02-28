@@ -22,6 +22,13 @@ const cpp = require('chainpoint-parse')
 const request = require('request')
 const rp = require('request-promise')
 
+Promise.config({
+  // Enables all warnings except forgotten return statements.
+  warnings: {
+    wForgottenReturn: false
+  }
+})
+
 const DNS_CORE_DISCOVERY_ADDR = '_core.addr.chainpoint.org'
 
 /**
