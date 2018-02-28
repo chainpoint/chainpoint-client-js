@@ -1,4 +1,4 @@
-const chp = require('./dist/bundle.node')
+const chp = require('./dist/bundle')
 // const dns = require('dns')
 
 async function runIt () {
@@ -16,8 +16,8 @@ async function runIt () {
   console.log(proofHandles)
 
   // Wait for Calendar proofs to be available
-  console.log('Sleeping 12 seconds to wait for proofs to generate...')
-  await new Promise(resolve => setTimeout(resolve, 12000))
+  console.log('Sleeping 16 seconds to wait for proofs to generate...')
+  await new Promise(resolve => setTimeout(resolve, 16000))
 
   // Retrieve a Calendar proof for each hash that was submitted
   let proofs = await chp.getProofs(proofHandles)
