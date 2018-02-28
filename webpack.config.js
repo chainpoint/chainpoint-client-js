@@ -38,7 +38,7 @@ let web = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: 'bundle.web.js',
     library: 'chainpointClient',
     libraryTarget: 'umd',
     umdNamedDefine: true
@@ -49,7 +49,7 @@ let node = {
   target: 'node',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.node.js',
+    filename: 'bundle.js',
     library: 'chainpointClient',
     libraryTarget: 'umd',
     umdNamedDefine: true
