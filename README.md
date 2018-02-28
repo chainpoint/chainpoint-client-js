@@ -1,4 +1,4 @@
-# Chainpoint Client (Javascript) 
+# Chainpoint Client (Javascript)
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
@@ -35,7 +35,7 @@ Nodes retain proofs for 24 hours. Each client must retrieve and permanently stor
 
 ### Verify Proof(s)
 
-Anyone with a Chainpoint proof can verify that it cryptographically anchors to one or more of the public blockchains. The verification process performs the operations in the proof to re-create a Merkle root. This value is compared to a Merkle root stored in the public blockchain. If the values match, the proof is valid. 
+Anyone with a Chainpoint proof can verify that it cryptographically anchors to one or more of the public blockchains. The verification process performs the operations in the proof to re-create a Merkle root. This value is compared to a Merkle root stored in the public blockchain. If the values match, the proof is valid.
 
 ### Evaluate Proof(s)
 
@@ -398,17 +398,17 @@ runIt()
 
 ### Browser Script Tag Example
 
-Note : You can copy `dist/bundle.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
+Note : You can copy `dist/bundle.web.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
 
 ```html
-  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/CURRENT-PROJECT-SHA1-HERE/dist/bundle.js"></script>
+  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/9b42e63f2591764954d917ae81caccc75f5c15f5/dist/bundle.web.js"></script>
 
 ```
 
 Or install the `npm` package in a place available to your web server pages and set the `script src` tag as shown in the example below. A set of window global functions (e.g. `chainpointClient.submitHashes()`) will then be available for use in a fashion similar to that shown in the examples above.
 
 ```html
-<script src="./node_modules/chainpoint-client/dist/bundle.js">
+<script src="./node_modules/chainpoint-client/dist/bundle.web.js">
 ```
 
 ## License
