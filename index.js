@@ -632,7 +632,6 @@ function evaluateProofs (proofs) {
   // Validate proofs arg
   if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
   if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
-  if (proofs.length > 250) throw new Error('proofs arg must be an Array with <= 250 elements')
 
   // If any entry in the proofs Array is an Object, process
   // it assuming the same form as the output of getProofs().
