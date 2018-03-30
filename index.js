@@ -145,7 +145,7 @@ function getNodes (num, callback) {
   return new Promise(function (resolve, reject) {
     getCores(1).then(coreURI => {
       let getNodeURI = _first(coreURI) + '/nodes/random'
-      request({ uri: getNodeURI, json: true, timeout: 5000 }, (err, response, body) => {
+      request({ uri: getNodeURI, json: true, timeout: 10000 }, (err, response, body) => {
         if (err) {
           reject(err)
           return callback(err)
@@ -383,7 +383,7 @@ function submitHashes (hashes, uris, callback) {
           headers: {
             'content-type': 'application/json'
           },
-          timeout: 5000,
+          timeout: 10000,
           json: true
         }
         return postOptions
@@ -470,7 +470,7 @@ function getProofs (proofHandles, callback) {
             'content-type': 'application/json',
             hashids: uuidsByNode[node].join(',')
           },
-          timeout: 5000,
+          timeout: 10000,
           json: true
         }
         return getOptions
@@ -565,7 +565,7 @@ function verifyProofs (proofs, uri, callback) {
             headers: {
               'content-type': 'application/json'
             },
-            timeout: 5000,
+            timeout: 10000,
             json: true
           }
         })
