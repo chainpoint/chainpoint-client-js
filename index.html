@@ -49,7 +49,7 @@
             let hashes = $('#hashes').val().split(',')
             let trimmedHashes = hashes.map(str => str.trim())
 
-            let nodes = ['http://35.188.224.112',
+            let nodes = ['http://35.230.179.171',
                          'http://35.186.176.183',
                          'http://35.188.230.126']
 
@@ -58,7 +58,7 @@
                 $('#proofHandles').html(JSON.stringify(proofHandles, null, 2))
 
                 // wait until a Calendar proof has been generated
-                sleep(12000).then(() => {
+                sleep(16000).then(() => {
                     chainpointClient.getProofs(proofHandles).then(proofObjects => {
                         console.log(JSON.stringify(proofObjects, null, 2))
                         $('#proofObjects').html(JSON.stringify(proofObjects, null, 2))
