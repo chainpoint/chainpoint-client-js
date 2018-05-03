@@ -616,11 +616,13 @@ function verifyProofs (proofs, uri, callback) {
           resolve(results)
           return callback(null, results)
         }).catch(err => {
-          console.error(err.message, '999')
+          console.error(err.message)
+          reject(err)
           return callback(err)
         })
       }).catch(err => {
         console.error(err.message)
+        reject(err)
         return callback(err)
       })
     } catch (err) {
