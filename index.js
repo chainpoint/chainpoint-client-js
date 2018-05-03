@@ -593,20 +593,21 @@ function verifyProofs (proofs, uri, callback) {
       }).then(([flatProofs, hashesByNodeURI]) => {
         // Fulfill the Promise for all of the request results.
         hashesByNodeURI.then(hashesFound => {
+          if (_isEmpty(hashesFound)) return Promise.reject(new Error('No hashes were found.'))
           let results = []
 
           _forEach(flatProofs, flatProof => {
             if (flatProof.expected_value === hashesFound[flatProof.uri]) {
-              // IT'S GOOD!
+                // IT'S GOOD!
               flatProof.verified = true
               flatProof.verified_at = new Date().toISOString().slice(0, 19) + 'Z'
             } else {
-              // IT'S NO GOOD :-(
+                // IT'S NO GOOD :-(
               flatProof.verified = false
               flatProof.verified_at = null
             }
 
-            // Camel case object keys
+              // Camel case object keys
             let flatProofCamel = _mapKeys(flatProof, (v, k) => _camelCase(k))
 
             results.push(flatProofCamel)
@@ -614,10 +615,13 @@ function verifyProofs (proofs, uri, callback) {
 
           resolve(results)
           return callback(null, results)
+        }).catch(err => {
+          console.error(err.message, '999')
+          return callback(err)
         })
       }).catch(err => {
         console.error(err.message)
-        throw err
+        return callback(err)
       })
     } catch (err) {
       reject(err)
