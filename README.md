@@ -396,6 +396,20 @@ async function runIt () {
 runIt()
 ```
 
+### Javascript Client-Side Frameworks Example
+
+Note: If you are using any client-side JavaScript framework (ex. Angular, React, etc) remember to import chainpoint-client in the following manner:
+
+```js
+import chainpoint from 'chainpoint-client/dist/bundle.web';
+```
+
+or
+
+```js
+const chainpoint = require('chainpoint-client/dist/bundle.web')
+```
+
 ### Browser Script Tag Example
 
 Note : You can copy `dist/bundle.web.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
