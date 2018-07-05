@@ -21,6 +21,8 @@ const uuidValidate = require('uuid-validate')
 const cpp = require('chainpoint-parse')
 const request = require('request')
 const rp = require('request-promise')
+const crypto = require('crypto')
+const fs = require('fs')
 
 Promise.config({
   // Enables all warnings except forgotten return statements.
@@ -418,6 +420,71 @@ function submitHashes (hashes, uris, callback) {
 }
 
 /**
+ * Submit hash(es) of selected file(s) to one or more Nodes, returning an Array of proof handle objects, one for each submitted hash and Node combination.
+ * @param {Array<String>} paths - An Array of paths of the files to be hashed.
+ * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
+ * @return {Array<{path: String, uri: String, hash: String, hashIdNode: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
+ */
+function submitFileHashes (paths, uris, callback) {
+  callback = callback || function () { }
+  uris = uris || []
+
+  // Validate callback is a function
+  if (!_isFunction(callback)) throw new Error('callback arg must be a function')
+
+  // Validate all paths provided
+  if (!_isArray(paths)) throw new Error('paths arg must be an Array')
+  if (_isEmpty(paths)) throw new Error('paths arg must be a non-empty Array')
+  if (paths.length > 250) throw new Error('paths arg must be an Array with <= 250 elements')
+  let rejects = _reject(paths, (path) => fs.existsSync(path) && fs.lstatSync(path).isFile())
+  if (!_isEmpty(rejects)) throw new Error(`paths arg contains invalid paths : ${rejects.join(', ')}`)
+
+  // Validate all Node URIs provided
+  if (!_isArray(uris)) throw new Error('uris arg must be an Array of String URIs')
+  if (uris.length > 5) throw new Error('uris arg must be an Array with <= 5 elements')
+
+  return new Promise(async function (resolve, reject) {
+    let hashObjs = []
+    try {
+      hashObjs = await Promise.all(paths.map((path) => sha256FileByPath(path)))
+    } catch (err) {
+      reject(err)
+      return callback(err)
+    }
+
+    submitHashes(hashObjs.map((hashObj) => hashObj.hash), uris).then((proofHandles) => {
+      proofHandles = proofHandles.map((proofHandle) => {
+        proofHandle.path = hashObjs.find((hashObj) => hashObj.hash === proofHandle.hash).path
+        return proofHandle
+      })
+      resolve(proofHandles)
+      return callback(null, proofHandles)
+    }, function (err) {
+      reject(err)
+      return callback(err)
+    })
+  }).catch(err => {
+    console.error(err.message)
+    throw err
+  })
+}
+
+function sha256FileByPath (path) {
+  return new Promise((resolve, reject) => {
+    let sha256 = crypto.createHash('sha256')
+    let readStream = fs.createReadStream(path)
+    readStream.on('data', data => sha256.update(data))
+    readStream.on('end', () => {
+      let hash = sha256.digest('hex')
+      console.log(`${path} hashed to ${hash}`)
+      resolve({ path, hash })
+    }
+    )
+    readStream.on('error', err => reject(err))
+  })
+}
+
+/**
  * Retrieve a collection of proofs for one or more hash IDs from the appropriate Node(s)
  * The output of `submitProofs()` can be passed directly as the `proofHandles` arg to
  * this function.
@@ -598,16 +665,16 @@ function verifyProofs (proofs, uri, callback) {
 
           _forEach(flatProofs, flatProof => {
             if (flatProof.expected_value === hashesFound[flatProof.uri]) {
-                // IT'S GOOD!
+              // IT'S GOOD!
               flatProof.verified = true
               flatProof.verified_at = new Date().toISOString().slice(0, 19) + 'Z'
             } else {
-                // IT'S NO GOOD :-(
+              // IT'S NO GOOD :-(
               flatProof.verified = false
               flatProof.verified_at = null
             }
 
-              // Camel case object keys
+            // Camel case object keys
             let flatProofCamel = _mapKeys(flatProof, (v, k) => _camelCase(k))
 
             results.push(flatProofCamel)
@@ -669,6 +736,7 @@ module.exports = {
   getCores: getCores,
   getNodes: getNodes,
   submitHashes: submitHashes,
+  submitFileHashes: submitFileHashes,
   getProofs: getProofs,
   verifyProofs: verifyProofs,
   evaluateProofs: evaluateProofs
