@@ -452,6 +452,16 @@ function submitFileHashes (paths, uris, callback) {
       return callback(err)
     }
 
+    // filter out any EACCES errors
+    hashObjs = hashObjs.filter((hashObj) => {
+      if (hashObj.error === 'EACCES') console.error(`Insufficient permission to read file '${hashObj.path}', skipping`)
+      return hashObj.error !== 'EACCES'
+    })
+    if (hashObjs.length === 0) {
+      resolve([])
+      return callback(null, [])
+    }
+
     submitHashes(hashObjs.map((hashObj) => hashObj.hash), uris).then((proofHandles) => {
       proofHandles = proofHandles.map((proofHandle) => {
         proofHandle.path = hashObjs.find((hashObj) => hashObj.hash === proofHandle.hash).path
@@ -478,9 +488,13 @@ function sha256FileByPath (path) {
       let hash = sha256.digest('hex')
       console.log(`${path} hashed to ${hash}`)
       resolve({ path, hash })
-    }
-    )
-    readStream.on('error', err => reject(err))
+    })
+    readStream.on('error', err => {
+      if (err.code === 'EACCES') {
+        resolve({ path: path, hash: null, error: 'EACCES' })
+      }
+      reject(err)
+    })
   })
 }
 
