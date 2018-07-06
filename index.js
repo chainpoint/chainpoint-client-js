@@ -486,7 +486,6 @@ function sha256FileByPath (path) {
     readStream.on('data', data => sha256.update(data))
     readStream.on('end', () => {
       let hash = sha256.digest('hex')
-      console.log(`${path} hashed to ${hash}`)
       resolve({ path, hash })
     })
     readStream.on('error', err => {
