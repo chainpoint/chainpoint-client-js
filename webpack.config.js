@@ -29,6 +29,7 @@ let base = {
 }
 
 let web = {
+  target: 'web',
   node: {
     dgram: 'empty',
     fs: 'empty',
@@ -40,6 +41,7 @@ let web = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.web.js',
     library: 'chainpointClient',
+    libraryExport: 'default',
     libraryTarget: 'umd',
     umdNamedDefine: true
   }
@@ -51,6 +53,7 @@ let node = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
     library: 'chainpointClient',
+    libraryExport: 'default',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
