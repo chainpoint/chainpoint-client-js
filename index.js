@@ -24,6 +24,8 @@ const rp = require('request-promise')
 const crypto = require('crypto')
 const fs = require('fs')
 
+const NODE_PROXY_URI = 'http://node-proxy.chainpoint.org'
+
 Promise.config({
   // Enables all warnings except forgotten return statements.
   warnings: {
@@ -376,15 +378,16 @@ function submitHashes (hashes, uris, callback) {
       // Setup an options Object for each Node we'll submit hashes to.
       // Each Node will then be sent the full Array of hashes.
       let nodesWithPostOpts = _map(nodes, node => {
+        let uri = (typeof window === 'object' && window.origin.startsWith('https:')) ? NODE_PROXY_URI : node
+        let headers = Object.assign({'content-type': 'application/json'}, (typeof window === 'object' && window.origin.startsWith('https:')) ? { 'X-Node-Uri': node } : {})
+
         let postOptions = {
           method: 'POST',
-          uri: node + '/hashes',
+          uri: uri + '/hashes',
           body: {
             hashes: hashes
           },
-          headers: {
-            'content-type': 'application/json'
-          },
+          headers,
           timeout: 10000,
           json: true
         }
