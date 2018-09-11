@@ -10,22 +10,23 @@ let base = {
         loader: 'babel-loader',
         query: {
           presets: [
-            ['env', {
-              targets: {
-                node: true,
-                'browsers': ['last 2 versions', 'safari >= 7']
-              },
-              // for uglifyjs...
-              forceAllTransforms: true
-            }]
+            [
+              'env',
+              {
+                targets: {
+                  node: true,
+                  browsers: ['last 2 versions', 'safari >= 7']
+                },
+                // for uglifyjs...
+                forceAllTransforms: true
+              }
+            ]
           ]
         }
       }
     ]
   },
-  plugins: [
-    new UglifyJSPlugin()
-  ]
+  plugins: [new UglifyJSPlugin()]
 }
 
 let web = {
@@ -61,13 +62,16 @@ let node = {
         loader: 'babel-loader',
         query: {
           presets: [
-            ['env', {
-              targets: {
-                node: true
-              },
-              // for uglifyjs...
-              forceAllTransforms: true
-            }]
+            [
+              'env',
+              {
+                targets: {
+                  node: true
+                },
+                // for uglifyjs...
+                forceAllTransforms: true
+              }
+            ]
           ]
         }
       }

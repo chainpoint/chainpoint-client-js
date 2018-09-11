@@ -1,6 +1,6 @@
 # Chainpoint Client (Javascript)
 
-[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 [![npm](https://img.shields.io/npm/l/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
 [![npm](https://img.shields.io/npm/v/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
@@ -48,29 +48,31 @@ This function is similar to the Verify function. The difference with this functi
 ```javascript
 const chp = require('chainpoint-client')
 
-async function runIt () {
+async function runIt() {
   // A few sample SHA-256 proofs to anchor
-  let hashes = ['1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
-                '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
-                '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a']
+  let hashes = [
+    '1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+    '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+    '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'
+  ]
 
   // Submit each hash to three randomly selected Nodes
   let proofHandles = await chp.submitHashes(hashes)
-  console.log("Submitted Proof Objects: Expand objects below to inspect.")
+  console.log('Submitted Proof Objects: Expand objects below to inspect.')
   console.log(proofHandles)
 
   // Wait for Calendar proofs to be available
-  console.log("Sleeping 12 seconds to wait for proofs to generate...")
+  console.log('Sleeping 12 seconds to wait for proofs to generate...')
   await new Promise(resolve => setTimeout(resolve, 12000))
 
   // Retrieve a Calendar proof for each hash that was submitted
   let proofs = await chp.getProofs(proofHandles)
-  console.log("Proof Objects: Expand objects below to inspect.")
+  console.log('Proof Objects: Expand objects below to inspect.')
   console.log(proofs)
 
   // Verify every anchor in every Calendar proof
   let verifiedProofs = await chp.verifyProofs(proofs)
-  console.log("Verified Proof Objects: Expand objects below to inspect.")
+  console.log('Verified Proof Objects: Expand objects below to inspect.')
   console.log(verifiedProofs)
 }
 
@@ -116,16 +118,16 @@ The Object will contain:
 Example Return Value
 
 ```javascript
-[
+;[
   {
-    "uri": "http://0.0.0.0",
-    "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
-    "hashIdNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34"
+    uri: 'http://0.0.0.0',
+    hash: '9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+    hashIdNode: 'a512e430-d3cb-11e7-aeb7-01eecbb37e34'
   },
   {
-    "uri": "http://0.0.0.0",
-    "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
-    "hashIdNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15"
+    uri: 'http://0.0.0.0',
+    hash: '9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+    hashIdNode: 'a4b6e180-d3cb-11e7-90bc-014342a27e15'
   }
 ]
 ```
@@ -160,19 +162,17 @@ This function will return an Array of Objects, each composed of the following pr
 
 `proof` : The Base64 encoded binary form of the proof. See [https://github.com/chainpoint/chainpoint-binary](https://github.com/chainpoint/chainpoint-binary) for more information about proof formats. That library can also be used to convert from one form to another. If the proof is not yet available, or cannot be retrieved, this will be set to `null`.
 
-`anchorsComplete` : An Array of Strings that indicates which blockchains the proof is anchored to at the time of retrieval. One or more of `cal` (Calendar), `btc` (Bitcoin), or `eth` (Ethereum).  If the proof is not yet available, or cannot be retrieved, this will be set to `[]` (An empty Array).
+`anchorsComplete` : An Array of Strings that indicates which blockchains the proof is anchored to at the time of retrieval. One or more of `cal` (Calendar), `btc` (Bitcoin), or `eth` (Ethereum). If the proof is not yet available, or cannot be retrieved, this will be set to `[]` (An empty Array).
 
 Example Return Value
 
 ```javascript
-[
+;[
   {
-    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
-    "proof": "eJytVjlvpEUQhf+CiDCu7upzopXIECERiVVdBx5psS17uMKFhBBSMmC5ViRIiJD/YcSP4c14dwHbCJAYjTTWePp1Vb2jvk++e6DnZzv/YPfL6W53cbU5Pn6ft/bq+eXbx3oq27OL8+3Z7vg9frz78MKfvPb8q8encnV6/cDExU2NMynFymIeIitVV2IpuazVZUwRcp1paNMyqSm3pq07tx/2MCdbOzk7N79+yUsPokVHxrGOUvJ+NM3mEQFwtVTGqPrz4cjVu+ud7W7nNydPZPdTptRx5CiPN6luMm3KeOs5vJ5fHuCFZu5/hl/FEuAb11k1UNZt+P3Jv4P/bl3KmZ761Wcff/1Qlj/8UeXhyf6r88uTm/99dX5x9fmjLx5ev3Koc2ubf9Pjoy/PL769OpWjXNvh8KGKw+F/7uD24U/Ptle7TaopjdIK0YbXStJWyWlpqrOZhTB5cOI+essl6mgys0ZalsGT4QBKGwtXr9J8zMyqpG1qDbzdzVdxGuhhaSsym7eeluz5D81URyXlmmstYXy7wN5mnXk8L7H2Tdo8k6O++ocO97LcYMSbmwOPvri8fiBFCqVEA8hV14DYUI9qztlbI0+9kJnXLMqTZiJqjl/nYk3x8ddpfXvDHfg86P0r3PX9Uzq39s3NrY/fvdxefXZ99HcFHuOQn5lcHt/8/ngvqD+U8tFTpayd3lXKby+8vB/I/9vUHlDBGFmhPhpFm5EbN5faWp4zTU+gfoDSkgM3RYwuvfY16mCuK6LdAZyA0hEJok3JnItkSU7TCuNdpofONZP7VA2bxGxhTrkUBIZO+ysgeKzRSllFdVTzkq1ALPsStC/nOa059F0jITiWxKzNUmorFqTaMnu9A4hGKMeg0Wfl3IarRac8tKLLngXQGCkNJUid5pxlzaiL4YTOandb7h4ZVEDxUR2moTRyQ7PIvxh1elOZLm0aIe5g0zqtuyMM0VIA9Bbgry++TiDu8EoZ987sEH8xUkTk4oXrQtZi8MySB5HwVCrelWjwGh3xOgICgR2fIcHVg6lUyhnfeMNHijRXauGodPaFkRiaDq5RUaV1doBPx1SaL1ERmzD8NB8LKFRtpi4ZA0kI+FGlFqAW1GNT3MlRzPA5Q3oUlJb6KMMxxGrFvDf0lihXL4QMgNjGsEqloT0Dl+IzL7CKbRGxpKa+tBcJnuisC+OCPMBePH1RpluvnJtk2jP+hoxUljwfKqXZEWOpgOaAVEvOAYKnGHfIvwkk32KZsvCaLGMM0Wdn92Q9eUrW0Qf5IIDWJ2NtUUApCwoKpFnm6Gn0FOgAQhIWipCKpdekKahDqgbEN9DZvZikoKijpBVgtjdIG7MsnVvRAu3rABmYGnzuQ7hifj0RepgMYu+tE5LjHhYNhKNdrlQpOriAkFZWrOJlrVdItKBqsAG7I1lYA21hJdyHyYgaC1/srRrQGJmOIOqoJGqD0dgJw9AlnpH8UdS6aZaBQvYKuoMJh3aslooNQ6tbkxh4UNA1oV2kheeaFK7Nnqz0CqQMeliljm6rYepW7sPkvAp42O+57pq5E+jBz3PB+nEEh/aEK6RULKx91wmmADZKToVC7sNEZKSMGISeMSDGkuqyzDGO3h38WaeFIvdp3YZ0M7h0wSaeG/b5zb67Pc/JaSWLPbXY3ZEI/mM0VytOw+jewsTAIBI5IWEwGjgh516QKiT3cgQrQN4LOzplAxmMR4XJlpNObvgj5sAkkX2QAVIZuwlRPByiF8l4OLsPc/XSuhZDVnKG/msg+QW6X1YFnrfVqWJBQJPR4L0oLEgBWAC893kXE/NMnoRtFE4dtVKHD1E6XD8QI5gIlRKrrQHOU6WENMVjReEORSQfd+u8vbWxWv+0tQvE0OZ/2doNVj422cnvD4t98Q==",
-    "anchorsComplete": [
-      "cal",
-      "btc"
-    ]
+    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
+    proof:
+      'eJytVjlvpEUQhf+CiDCu7upzopXIECERiVVdBx5psS17uMKFhBBSMmC5ViRIiJD/YcSP4c14dwHbCJAYjTTWePp1Vb2jvk++e6DnZzv/YPfL6W53cbU5Pn6ft/bq+eXbx3oq27OL8+3Z7vg9frz78MKfvPb8q8encnV6/cDExU2NMynFymIeIitVV2IpuazVZUwRcp1paNMyqSm3pq07tx/2MCdbOzk7N79+yUsPokVHxrGOUvJ+NM3mEQFwtVTGqPrz4cjVu+ud7W7nNydPZPdTptRx5CiPN6luMm3KeOs5vJ5fHuCFZu5/hl/FEuAb11k1UNZt+P3Jv4P/bl3KmZ761Wcff/1Qlj/8UeXhyf6r88uTm/99dX5x9fmjLx5ev3Koc2ubf9Pjoy/PL769OpWjXNvh8KGKw+F/7uD24U/Ptle7TaopjdIK0YbXStJWyWlpqrOZhTB5cOI+essl6mgys0ZalsGT4QBKGwtXr9J8zMyqpG1qDbzdzVdxGuhhaSsym7eeluz5D81URyXlmmstYXy7wN5mnXk8L7H2Tdo8k6O++ocO97LcYMSbmwOPvri8fiBFCqVEA8hV14DYUI9qztlbI0+9kJnXLMqTZiJqjl/nYk3x8ddpfXvDHfg86P0r3PX9Uzq39s3NrY/fvdxefXZ99HcFHuOQn5lcHt/8/ngvqD+U8tFTpayd3lXKby+8vB/I/9vUHlDBGFmhPhpFm5EbN5faWp4zTU+gfoDSkgM3RYwuvfY16mCuK6LdAZyA0hEJok3JnItkSU7TCuNdpofONZP7VA2bxGxhTrkUBIZO+ysgeKzRSllFdVTzkq1ALPsStC/nOa059F0jITiWxKzNUmorFqTaMnu9A4hGKMeg0Wfl3IarRac8tKLLngXQGCkNJUid5pxlzaiL4YTOandb7h4ZVEDxUR2moTRyQ7PIvxh1elOZLm0aIe5g0zqtuyMM0VIA9Bbgry++TiDu8EoZ987sEH8xUkTk4oXrQtZi8MySB5HwVCrelWjwGh3xOgICgR2fIcHVg6lUyhnfeMNHijRXauGodPaFkRiaDq5RUaV1doBPx1SaL1ERmzD8NB8LKFRtpi4ZA0kI+FGlFqAW1GNT3MlRzPA5Q3oUlJb6KMMxxGrFvDf0lihXL4QMgNjGsEqloT0Dl+IzL7CKbRGxpKa+tBcJnuisC+OCPMBePH1RpluvnJtk2jP+hoxUljwfKqXZEWOpgOaAVEvOAYKnGHfIvwkk32KZsvCaLGMM0Wdn92Q9eUrW0Qf5IIDWJ2NtUUApCwoKpFnm6Gn0FOgAQhIWipCKpdekKahDqgbEN9DZvZikoKijpBVgtjdIG7MsnVvRAu3rABmYGnzuQ7hifj0RepgMYu+tE5LjHhYNhKNdrlQpOriAkFZWrOJlrVdItKBqsAG7I1lYA21hJdyHyYgaC1/srRrQGJmOIOqoJGqD0dgJw9AlnpH8UdS6aZaBQvYKuoMJh3aslooNQ6tbkxh4UNA1oV2kheeaFK7Nnqz0CqQMeliljm6rYepW7sPkvAp42O+57pq5E+jBz3PB+nEEh/aEK6RULKx91wmmADZKToVC7sNEZKSMGISeMSDGkuqyzDGO3h38WaeFIvdp3YZ0M7h0wSaeG/b5zb67Pc/JaSWLPbXY3ZEI/mM0VytOw+jewsTAIBI5IWEwGjgh516QKiT3cgQrQN4LOzplAxmMR4XJlpNObvgj5sAkkX2QAVIZuwlRPByiF8l4OLsPc/XSuhZDVnKG/msg+QW6X1YFnrfVqWJBQJPR4L0oLEgBWAC893kXE/NMnoRtFE4dtVKHD1E6XD8QI5gIlRKrrQHOU6WENMVjReEORSQfd+u8vbWxWv+0tQvE0OZ/2doNVj422cnvD4t98Q==',
+    anchorsComplete: ['cal', 'btc']
   }
 ]
 ```
@@ -206,32 +206,34 @@ For example, a single proof that is anchored to both the Chainpoint Calendar, an
 Example Return Value
 
 ```javascript
-[
+;[
   {
-    "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
-    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
-    "hashIdCore": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
-    "hashSubmittedNodeAt": "2017-11-28T05:20:48Z",
-    "hashSubmittedCoreAt": "2017-11-28T05:20:48Z",
-    "uri": "http://127.0.0.1/calendar/695928/hash",
-    "type": "cal",
-    "anchorId": "695928",
-    "expectedValue": "ff0fb5903d3b6deed2ee2ebc033813e7b0357de4af2e7b1d52784baad40a0d13",
-    "verified": true,
-    "verifiedAt": "2017-11-28T22:52:20Z"
+    hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
+    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
+    hashIdCore: 'e4a09270-d3fb-11e7-b4d1-0163595cf66c',
+    hashSubmittedNodeAt: '2017-11-28T05:20:48Z',
+    hashSubmittedCoreAt: '2017-11-28T05:20:48Z',
+    uri: 'http://127.0.0.1/calendar/695928/hash',
+    type: 'cal',
+    anchorId: '695928',
+    expectedValue:
+      'ff0fb5903d3b6deed2ee2ebc033813e7b0357de4af2e7b1d52784baad40a0d13',
+    verified: true,
+    verifiedAt: '2017-11-28T22:52:20Z'
   },
   {
-    "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
-    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
-    "hashIdCore": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
-    "hashSubmittedNodeAt": "2017-11-28T05:20:48Z",
-    "hashSubmittedCoreAt": "2017-11-28T05:20:48Z",
-    "uri": "http://127.0.0.1/calendar/696030/data",
-    "type": "btc",
-    "anchorId": "496469",
-    "expectedValue": "de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b",
-    "verified": true,
-    "verifiedAt": "2017-11-28T22:52:20Z"
+    hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
+    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
+    hashIdCore: 'e4a09270-d3fb-11e7-b4d1-0163595cf66c',
+    hashSubmittedNodeAt: '2017-11-28T05:20:48Z',
+    hashSubmittedCoreAt: '2017-11-28T05:20:48Z',
+    uri: 'http://127.0.0.1/calendar/696030/data',
+    type: 'btc',
+    anchorId: '496469',
+    expectedValue:
+      'de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b',
+    verified: true,
+    verifiedAt: '2017-11-28T22:52:20Z'
   }
 ]
 ```
@@ -265,28 +267,30 @@ For example, a single proof that is anchored to both the Chainpoint Calendar, an
 Example Return Value
 
 ```javascript
-[
+;[
   {
-    "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
-    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
-    "hashIdCore": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
-    "hashSubmittedNodeAt": "2017-11-28T05:20:48Z",
-    "hashSubmittedCoreAt": "2017-11-28T05:20:48Z",
-    "uri": "http://127.0.0.1/calendar/695928/hash",
-    "type": "cal",
-    "anchorId": "695928",
-    "expectedValue": "ff0fb5903d3b6deed2ee2ebc033813e7b0357de4af2e7b1d52784baad40a0d13"
+    hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
+    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
+    hashIdCore: 'e4a09270-d3fb-11e7-b4d1-0163595cf66c',
+    hashSubmittedNodeAt: '2017-11-28T05:20:48Z',
+    hashSubmittedCoreAt: '2017-11-28T05:20:48Z',
+    uri: 'http://127.0.0.1/calendar/695928/hash',
+    type: 'cal',
+    anchorId: '695928',
+    expectedValue:
+      'ff0fb5903d3b6deed2ee2ebc033813e7b0357de4af2e7b1d52784baad40a0d13'
   },
   {
-    "hash": "daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36",
-    "hashIdNode": "e47f00b0-d3fb-11e7-9dd9-015eb614885c",
-    "hashIdCore": "e4a09270-d3fb-11e7-b4d1-0163595cf66c",
-    "hashSubmittedNodeAt": "2017-11-28T05:20:48Z",
-    "hashSubmittedCoreAt": "2017-11-28T05:20:48Z",
-    "uri": "http://127.0.0.1/calendar/696030/data",
-    "type": "btc",
-    "anchorId": "496469",
-    "expectedValue": "de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b"
+    hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
+    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
+    hashIdCore: 'e4a09270-d3fb-11e7-b4d1-0163595cf66c',
+    hashSubmittedNodeAt: '2017-11-28T05:20:48Z',
+    hashSubmittedCoreAt: '2017-11-28T05:20:48Z',
+    uri: 'http://127.0.0.1/calendar/696030/data',
+    type: 'btc',
+    anchorId: '496469',
+    expectedValue:
+      'de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b'
   }
 ]
 ```
@@ -350,7 +354,7 @@ let hashes = [
   '9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'
 ]
 
-cp.submitHashes(hashes, function (err, data) {
+cp.submitHashes(hashes, function(err, data) {
   if (err) {
     // `err` will contain any returned Error object and halt execution
     throw err
@@ -370,13 +374,15 @@ let hashes = [
   '9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'
 ]
 
-cp.submitHashes(hashes, testNodesArray).then(function (data) {
-  // `data` will contain the returned values
-  console.log(JSON.stringify(data, null, 2))
-}).catch(function (err) {
-  // `err` will contain any returned Error object
-  console.log(err)
-})
+cp.submitHashes(hashes, testNodesArray)
+  .then(function(data) {
+    // `data` will contain the returned values
+    console.log(JSON.stringify(data, null, 2))
+  })
+  .catch(function(err) {
+    // `err` will contain any returned Error object
+    console.log(err)
+  })
 ```
 
 ### Promises `async/await` Style Example
@@ -388,7 +394,7 @@ let hashes = [
   '9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'
 ]
 
-async function runIt () {
+async function runIt() {
   let data = await cp.submitHashes(hashes)
   console.log(JSON.stringify(data, null, 2))
 }
@@ -401,7 +407,7 @@ runIt()
 Note: If you are using any client-side JavaScript framework (ex. Angular, React, etc) remember to import chainpoint-client in the following manner:
 
 ```js
-import chainpoint from 'chainpoint-client/dist/bundle.web';
+import chainpoint from 'chainpoint-client/dist/bundle.web'
 ```
 
 or
@@ -416,7 +422,6 @@ Note : You can copy `dist/bundle.web.js` into your app to be served from your ow
 
 ```html
   <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/9db515aa5a4380181feb287bf4ed474ed86eb010/dist/bundle.web.js"></script>
-
 ```
 
 Or install the `npm` package in a place available to your web server pages and set the `script src` tag as shown in the example below. A set of window global functions (e.g. `chainpointClient.submitHashes()`) will then be available for use in a fashion similar to that shown in the examples above.
@@ -424,6 +429,30 @@ Or install the `npm` package in a place available to your web server pages and s
 ```html
 <script src="./node_modules/chainpoint-client/dist/bundle.web.js">
 ```
+
+## Development
+
+### Code Formatting & Linting
+
+This project makes use of [Prettier](https://prettier.io/) & [ESLint](https://eslint.org/) to maintain clean, and consistently styled, code.
+
+You can run ESLint manually using the CLI:
+
+```sh
+./node_modules/.bin/eslint .
+```
+
+You can run Prettier manually to see which files would be re-formatted by it. For example:
+
+```sh
+./node_modules/.bin/prettier -l ./*.js
+```
+
+This project is coded in the [Visual Studio Code](https://code.visualstudio.com/) IDE and we use the following plugins to auto-format and report on linting issues during development:
+
+[vscode-eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+
+[EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
 
 ## License
 

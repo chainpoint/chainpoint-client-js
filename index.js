@@ -12,7 +12,31 @@
 
 'use strict'
 
-import { isString as _isString, isEmpty as _isEmpty, isFunction as _isFunction, isInteger as _isInteger, map as _map, shuffle as _shuffle, filter as _filter, slice as _slice, first as _first, isObject as _isObject, has as _has, isArray as _isArray, forEach as _forEach, isBuffer as _isBuffer, reject as _reject, uniq as _uniq, every as _every, keys as _keys, flatten as _flatten, mapKeys as _mapKeys, camelCase as _camelCase, uniqWith as _uniqWith, isEqual as _isEqual } from 'lodash'
+import {
+  isString as _isString,
+  isEmpty as _isEmpty,
+  isFunction as _isFunction,
+  isInteger as _isInteger,
+  map as _map,
+  shuffle as _shuffle,
+  filter as _filter,
+  slice as _slice,
+  first as _first,
+  isObject as _isObject,
+  has as _has,
+  isArray as _isArray,
+  forEach as _forEach,
+  isBuffer as _isBuffer,
+  reject as _reject,
+  uniq as _uniq,
+  every as _every,
+  keys as _keys,
+  flatten as _flatten,
+  mapKeys as _mapKeys,
+  camelCase as _camelCase,
+  uniqWith as _uniqWith,
+  isEqual as _isEqual
+} from 'lodash'
 const Promise = require('bluebird')
 const dns = require('dns')
 const url = require('url')
@@ -37,7 +61,7 @@ const DNS_CORE_DISCOVERY_ADDR = '_core.addr.chainpoint.org'
  * @param {string} coreURI - The Core URI to test for validity
  * @returns {bool} true if coreURI is a valid Core URI, otherwise false
  */
-function _isValidCoreURI (coreURI) {
+function _isValidCoreURI(coreURI) {
   if (_isEmpty(coreURI) || !_isString(coreURI)) return false
 
   try {
@@ -58,13 +82,14 @@ function _isValidCoreURI (coreURI) {
  * @param {function} callback - An optional callback function.
  * @returns {string} - Returns either a callback or a Promise with an Array of Core URI strings.
  */
-function getCores (num, callback) {
-  callback = callback || function () { }
+function getCores(num, callback) {
+  callback = callback || function() {}
   num = num || 1
 
-  if (!_isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
+  if (!_isInteger(num) || num < 1)
+    throw new Error('num arg must be an Integer >= 1')
 
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     if (dns && _isFunction(dns.resolveTxt)) {
       dns.resolveTxt(DNS_CORE_DISCOVERY_ADDR, (err, records) => {
         if (err) {
@@ -85,7 +110,9 @@ function getCores (num, callback) {
         // randomize the order
         let shuffledCores = _shuffle(cores)
         // only return cores with valid addresses (should be all)
-        let filteredCores = _filter(shuffledCores, function (c) { return _isValidCoreURI(c) })
+        let filteredCores = _filter(shuffledCores, function(c) {
+          return _isValidCoreURI(c)
+        })
         // only return num cores
         let slicedCores = _slice(filteredCores, 0, num)
 
@@ -95,7 +122,11 @@ function getCores (num, callback) {
     } else {
       // `dns` module is not available in the browser
       // fallback to simple random selection of Cores
-      let cores = ['https://a.chainpoint.org', 'https://b.chainpoint.org', 'https://c.chainpoint.org']
+      let cores = [
+        'https://a.chainpoint.org',
+        'https://b.chainpoint.org',
+        'https://c.chainpoint.org'
+      ]
       let slicedCores = _slice(_shuffle(cores), 0, num)
       resolve(slicedCores)
       return callback(null, slicedCores)
@@ -109,7 +140,7 @@ function getCores (num, callback) {
  * @param {string} nodeURI - The value to check
  * @returns {bool} true if value is a valid Node URI, otherwise false
  */
-function _isValidNodeURI (nodeURI) {
+function _isValidNodeURI(nodeURI) {
   if (!_isString(nodeURI)) return false
 
   try {
@@ -136,39 +167,50 @@ function _isValidNodeURI (nodeURI) {
  * @param {function} callback - An optional callback function.
  * @returns {Array<String>} - Returns either a callback or a Promise with an Array of Node URI strings
  */
-function getNodes (num, callback) {
-  callback = callback || function () { }
+function getNodes(num, callback) {
+  callback = callback || function() {}
   num = num || 3
 
-  if (!_isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
+  if (!_isInteger(num) || num < 1)
+    throw new Error('num arg must be an Integer >= 1')
 
-  return new Promise(function (resolve, reject) {
-    getCores(1).then(coreURI => {
-      let getNodeURI = _first(coreURI) + '/nodes/random'
-      request({ uri: getNodeURI, json: true, timeout: 10000 }, (err, response, body) => {
-        if (err) {
-          reject(err)
-          return callback(err)
-        }
+  return new Promise(function(resolve, reject) {
+    getCores(1)
+      .then(coreURI => {
+        let getNodeURI = _first(coreURI) + '/nodes/random'
+        request(
+          { uri: getNodeURI, json: true, timeout: 10000 },
+          (err, response, body) => {
+            if (err) {
+              reject(err)
+              return callback(err)
+            }
 
-        // extract public_uri from each node object
-        let nodes = _map(body, 'public_uri')
-        // randomize the order
-        let shuffledNodes = _shuffle(nodes)
-        // only return nodes with valid addresses (should be all)
-        let filteredNodes = _filter(shuffledNodes, function (n) { return _isValidNodeURI(n) })
-        // only return maxNodes nodes
-        let slicedNodes = _slice(filteredNodes, 0, num)
-        // We should never return an empty array of nodes
-        if (!slicedNodes.length) throw new Error('There seems to be an issue retrieving a list of available nodes. Please try again.')
+            // extract public_uri from each node object
+            let nodes = _map(body, 'public_uri')
+            // randomize the order
+            let shuffledNodes = _shuffle(nodes)
+            // only return nodes with valid addresses (should be all)
+            let filteredNodes = _filter(shuffledNodes, function(n) {
+              return _isValidNodeURI(n)
+            })
+            // only return maxNodes nodes
+            let slicedNodes = _slice(filteredNodes, 0, num)
+            // We should never return an empty array of nodes
+            if (!slicedNodes.length)
+              throw new Error(
+                'There seems to be an issue retrieving a list of available nodes. Please try again.'
+              )
 
-        resolve(slicedNodes)
-        return callback(null, slicedNodes)
+            resolve(slicedNodes)
+            return callback(null, slicedNodes)
+          }
+        )
       })
-    }).catch(err => {
-      reject(err)
-      return callback(err)
-    })
+      .catch(err => {
+        reject(err)
+        return callback(err)
+      })
   })
 }
 
@@ -178,7 +220,7 @@ function getNodes (num, callback) {
  * @param {string} value - The value to check
  * @returns {bool} true if value is a hexadecimal string, otherwise false
  */
-function _isHex (value) {
+function _isHex(value) {
   var hexRegex = /^[0-9a-f]{2,}$/i
   var isHex = hexRegex.test(value) && !(value.length % 2)
   return isHex
@@ -190,11 +232,13 @@ function _isHex (value) {
  * @param {Object} handle - The proof handle to check
  * @returns {bool} true if handle is valid Object with expected params, otherwise false
  */
-function _isValidProofHandle (handle) {
-  if (!_isEmpty(handle) &&
+function _isValidProofHandle(handle) {
+  if (
+    !_isEmpty(handle) &&
     _isObject(handle) &&
     _has(handle, 'uri') &&
-    _has(handle, 'hashIdNode')) {
+    _has(handle, 'hashIdNode')
+  ) {
     return true
   }
 }
@@ -205,7 +249,7 @@ function _isValidProofHandle (handle) {
  * @param {string} uuid - The uuid to check
  * @returns {bool} true if uuid is valid, otherwise false
  */
-function _isValidUUID (uuid) {
+function _isValidUUID(uuid) {
   if (uuidValidate(uuid, 1)) {
     return true
   }
@@ -219,8 +263,9 @@ function _isValidUUID (uuid) {
  * @param {Array} respArray - An Array of responses, one for each Node submitted to
  * @returns {Array<{uri: String, hash: String, hashIdNode: String}>} An Array of proofHandles
  */
-function _mapSubmitHashesRespToProofHandles (respArray) {
-  if (!_isArray(respArray)) throw new Error('_mapSubmitHashesRespToProofHandles arg must be an Array')
+function _mapSubmitHashesRespToProofHandles(respArray) {
+  if (!_isArray(respArray))
+    throw new Error('_mapSubmitHashesRespToProofHandles arg must be an Array')
 
   let proofHandles = []
 
@@ -243,7 +288,7 @@ function _mapSubmitHashesRespToProofHandles (respArray) {
  * @param {Array} proofs - An Array of proofs in any supported form
  * @returns {Array} An Array of parsed proofs
  */
-function _parseProofs (proofs) {
+function _parseProofs(proofs) {
   if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
   if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
 
@@ -274,9 +319,11 @@ function _parseProofs (proofs) {
  * @param {Array} parsedProofs - An Array of previously parsed proofs
  * @returns {Array} An Array of flattened proof objects
  */
-function _flattenProofs (parsedProofs) {
-  if (!_isArray(parsedProofs)) throw new Error('parsedProofs arg must be an Array')
-  if (_isEmpty(parsedProofs)) throw new Error('parsedProofs arg must be a non-empty Array')
+function _flattenProofs(parsedProofs) {
+  if (!_isArray(parsedProofs))
+    throw new Error('parsedProofs arg must be an Array')
+  if (_isEmpty(parsedProofs))
+    throw new Error('parsedProofs arg must be a non-empty Array')
 
   let flatProofAnchors = []
 
@@ -287,8 +334,10 @@ function _flattenProofs (parsedProofs) {
       flatProofAnchor.hash = parsedProof.hash
       flatProofAnchor.hash_id_node = parsedProof.hash_id_node
       flatProofAnchor.hash_id_core = parsedProof.hash_id_core
-      flatProofAnchor.hash_submitted_node_at = parsedProof.hash_submitted_node_at
-      flatProofAnchor.hash_submitted_core_at = parsedProof.hash_submitted_core_at
+      flatProofAnchor.hash_submitted_node_at =
+        parsedProof.hash_submitted_node_at
+      flatProofAnchor.hash_submitted_core_at =
+        parsedProof.hash_submitted_core_at
       flatProofAnchor.branch = proofAnchor.branch
       flatProofAnchor.uri = proofAnchor.uri
       flatProofAnchor.type = proofAnchor.type
@@ -308,7 +357,7 @@ function _flattenProofs (parsedProofs) {
  * @param {Array} proofBranchArray - An Array of branches for a given level in a proof
  * @returns {Array} An Array of flattened proof anchor objects for each branch
  */
-function _flattenProofBranches (proofBranchArray) {
+function _flattenProofBranches(proofBranchArray) {
   let flatProofAnchors = []
 
   _forEach(proofBranchArray, proofBranch => {
@@ -323,7 +372,9 @@ function _flattenProofBranches (proofBranchArray) {
       flatProofAnchors.push(flatAnchor)
     })
     if (proofBranch.branches) {
-      flatProofAnchors = flatProofAnchors.concat(_flattenProofBranches(proofBranch.branches))
+      flatProofAnchors = flatProofAnchors.concat(
+        _flattenProofBranches(proofBranch.branches)
+      )
     }
   })
   return flatProofAnchors
@@ -335,9 +386,9 @@ function _flattenProofBranches (proofBranchArray) {
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
  * @return {Array<{uri: String, hash: String, hashIdNode: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
  */
-function submitHashes (hashes, uris, callback) {
+function submitHashes(hashes, uris, callback) {
   uris = uris || []
-  callback = callback || function () { }
+  callback = callback || function() {}
   let nodesPromise
 
   // Validate callback is a function
@@ -346,13 +397,21 @@ function submitHashes (hashes, uris, callback) {
   // Validate all hashes provided
   if (!_isArray(hashes)) throw new Error('hashes arg must be an Array')
   if (_isEmpty(hashes)) throw new Error('hashes arg must be a non-empty Array')
-  if (hashes.length > 250) throw new Error('hashes arg must be an Array with <= 250 elements')
-  let rejects = _reject(hashes, function (h) { return _isHex(h) })
-  if (!_isEmpty(rejects)) throw new Error(`hashes arg contains invalid hashes : ${rejects.join(', ')}`)
+  if (hashes.length > 250)
+    throw new Error('hashes arg must be an Array with <= 250 elements')
+  let rejects = _reject(hashes, function(h) {
+    return _isHex(h)
+  })
+  if (!_isEmpty(rejects))
+    throw new Error(
+      `hashes arg contains invalid hashes : ${rejects.join(', ')}`
+    )
 
   // Validate all Node URIs provided
-  if (!_isArray(uris)) throw new Error('uris arg must be an Array of String URIs')
-  if (uris.length > 5) throw new Error('uris arg must be an Array with <= 5 elements')
+  if (!_isArray(uris))
+    throw new Error('uris arg must be an Array of String URIs')
+  if (uris.length > 5)
+    throw new Error('uris arg must be an Array with <= 5 elements')
 
   if (_isEmpty(uris)) {
     // get a list of nodes via service discovery
@@ -362,58 +421,68 @@ function submitHashes (hashes, uris, callback) {
     uris = _uniq(uris)
 
     // non-empty, check that *all* are valid or throw
-    let badURIs = _reject(uris, function (h) { return _isValidNodeURI(h) })
-    if (!_isEmpty(badURIs)) throw new Error(`uris arg contains invalid URIs : ${badURIs.join(', ')}`)
+    let badURIs = _reject(uris, function(h) {
+      return _isValidNodeURI(h)
+    })
+    if (!_isEmpty(badURIs))
+      throw new Error(`uris arg contains invalid URIs : ${badURIs.join(', ')}`)
     // all provided URIs were valid
     nodesPromise = Promise.resolve(uris)
   }
 
-  return new Promise(function (resolve, reject) {
+  const rejectUnauthorized = this.rejectUnauthorized
+  return new Promise(function(resolve, reject) {
     // Resolve an Array of Nodes from service discovery or the arg provided
-    nodesPromise.then((nodes) => {
-      // Setup an options Object for each Node we'll submit hashes to.
-      // Each Node will then be sent the full Array of hashes.
-      let nodesWithPostOpts = _map(nodes, node => {
-        let postOptions = {
-          method: 'POST',
-          uri: node + '/hashes',
-          body: {
-            hashes: hashes
-          },
-          headers: {
-            'content-type': 'application/json'
-          },
-          timeout: 10000,
-          json: true
-        }
-        return postOptions
-      })
-
-      // All requests succeed in parallel or all fail.
-      Promise.map(nodesWithPostOpts, rp, { concurrency: 25 }).then(parsedBody => {
-        // Nodes cannot be guaranteed to know what IP address they are reachable
-        // at, so we need to amend each result with the Node URI it was submitted
-        // to so that proofs may later be retrieved from the appropriate Node(s).
-        // This mapping relies on that fact that Promise.map returns results in the
-        // same order that options were passed to it so the results can be mapped to
-        // the Nodes submitted to.
-        _forEach(nodes, (uri, index) => {
-          parsedBody[index].meta.submitted_to = uri
+    nodesPromise
+      .then(nodes => {
+        // Setup an options Object for each Node we'll submit hashes to.
+        // Each Node will then be sent the full Array of hashes.
+        let nodesWithPostOpts = _map(nodes, node => {
+          let postOptions = {
+            method: 'POST',
+            uri: node + '/hashes',
+            body: {
+              hashes: hashes
+            },
+            headers: {
+              'content-type': 'application/json'
+            },
+            rejectUnauthorized,
+            timeout: 10000,
+            json: true
+          }
+          return postOptions
         })
 
-        // Map the API response to a form easily consumable by getProofs
-        let proofHandles = _mapSubmitHashesRespToProofHandles(parsedBody)
+        // All requests succeed in parallel or all fail.
+        Promise.map(nodesWithPostOpts, rp, { concurrency: 25 }).then(
+          parsedBody => {
+            // Nodes cannot be guaranteed to know what IP address they are reachable
+            // at, so we need to amend each result with the Node URI it was submitted
+            // to so that proofs may later be retrieved from the appropriate Node(s).
+            // This mapping relies on that fact that Promise.map returns results in the
+            // same order that options were passed to it so the results can be mapped to
+            // the Nodes submitted to.
+            _forEach(nodes, (uri, index) => {
+              parsedBody[index].meta.submitted_to = uri
+            })
 
-        resolve(proofHandles)
-        return callback(null, proofHandles)
-      }, function (err) {
-        reject(err)
-        return callback(err)
+            // Map the API response to a form easily consumable by getProofs
+            let proofHandles = _mapSubmitHashesRespToProofHandles(parsedBody)
+
+            resolve(proofHandles)
+            return callback(null, proofHandles)
+          },
+          function(err) {
+            reject(err)
+            return callback(err)
+          }
+        )
       })
-    }).catch(err => {
-      console.error(err.message)
-      throw err
-    })
+      .catch(err => {
+        console.error(err.message)
+        throw err
+      })
   })
 }
 
@@ -426,27 +495,56 @@ function submitHashes (hashes, uris, callback) {
  * @param {function} callback - An optional callback function.
  * @return {Array<{uri: String, hashIdNode: String, proof: String}>} - An Array of Objects, each returning the URI the proof was returned from and the Proof in Base64 encoded binary form.
  */
-function getProofs (proofHandles, callback) {
-  callback = callback || function () { }
+function getProofs(proofHandles, callback) {
+  callback = callback || function() {}
 
   // Validate callback is a function
   if (!_isFunction(callback)) throw new Error('callback arg must be a function')
 
   // Validate all proofHandles provided
-  if (!_isArray(proofHandles)) throw new Error('proofHandles arg must be an Array')
-  if (_isEmpty(proofHandles)) throw new Error('proofHandles arg must be a non-empty Array')
-  if (!_every(proofHandles, h => { return _isValidProofHandle(h) })) throw new Error('proofHandles Array contains invalid Objects')
-  if (proofHandles.length > 250) throw new Error('proofHandles arg must be an Array with <= 250 elements')
+  if (!_isArray(proofHandles))
+    throw new Error('proofHandles arg must be an Array')
+  if (_isEmpty(proofHandles))
+    throw new Error('proofHandles arg must be a non-empty Array')
+  if (
+    !_every(proofHandles, h => {
+      return _isValidProofHandle(h)
+    })
+  )
+    throw new Error('proofHandles Array contains invalid Objects')
+  if (proofHandles.length > 250)
+    throw new Error('proofHandles arg must be an Array with <= 250 elements')
 
   // Validate that *all* URI's provided are valid or throw
-  let badHandleURIs = _reject(proofHandles, function (u) { return _isValidNodeURI(u.uri) })
-  if (!_isEmpty(badHandleURIs)) throw new Error(`some proof handles contain invalid URI values : ${(_map(badHandleURIs, h => { return h.uri })).join(', ')}`)
+  let badHandleURIs = _reject(proofHandles, function(u) {
+    return _isValidNodeURI(u.uri)
+  })
+  if (!_isEmpty(badHandleURIs))
+    throw new Error(
+      `some proof handles contain invalid URI values : ${_map(
+        badHandleURIs,
+        h => {
+          return h.uri
+        }
+      ).join(', ')}`
+    )
 
   // Validate that *all* hashIdNode's provided are valid or throw
-  let badHandleUUIDs = _reject(proofHandles, function (u) { return _isValidUUID(u.hashIdNode) })
-  if (!_isEmpty(badHandleUUIDs)) throw new Error(`some proof handles contain invalid hashIdNode UUID values : ${(_map(badHandleUUIDs, h => { return h.hashIdNode })).join(', ')}`)
+  let badHandleUUIDs = _reject(proofHandles, function(u) {
+    return _isValidUUID(u.hashIdNode)
+  })
+  if (!_isEmpty(badHandleUUIDs))
+    throw new Error(
+      `some proof handles contain invalid hashIdNode UUID values : ${_map(
+        badHandleUUIDs,
+        h => {
+          return h.hashIdNode
+        }
+      ).join(', ')}`
+    )
 
-  return new Promise(function (resolve, reject) {
+  const rejectUnauthorized = this.rejectUnauthorized
+  return new Promise(function(resolve, reject) {
     try {
       // Collect together all proof UUIDs destined for a single Node
       // so they can be submitted to the Node in a single request.
@@ -471,37 +569,41 @@ function getProofs (proofHandles, callback) {
             hashids: uuidsByNode[node].join(',')
           },
           timeout: 10000,
-          json: true
+          json: true,
+          rejectUnauthorized
         }
         return getOptions
       })
 
       // Perform parallel GET requests to all Nodes with proofs
-      Promise.map(nodesWithGetOpts, rp, { concurrency: 25 }).then(function (parsedBody) {
-        // Promise.map returns an Array entry for each host it submits to.
-        let flatParsedBody = _flatten(parsedBody)
+      Promise.map(nodesWithGetOpts, rp, { concurrency: 25 }).then(
+        function(parsedBody) {
+          // Promise.map returns an Array entry for each host it submits to.
+          let flatParsedBody = _flatten(parsedBody)
 
-        let proofsResponse = []
+          let proofsResponse = []
 
-        try {
-          _forEach(flatParsedBody, proofResp => {
-            // Set to empty Array if unset of null
-            proofResp.anchors_complete = proofResp.anchors_complete || []
-            // Camel case object keys
-            let proofRespCamel = _mapKeys(proofResp, (v, k) => _camelCase(k))
-            proofsResponse.push(proofRespCamel)
-          })
-        } catch (err) {
+          try {
+            _forEach(flatParsedBody, proofResp => {
+              // Set to empty Array if unset of null
+              proofResp.anchors_complete = proofResp.anchors_complete || []
+              // Camel case object keys
+              let proofRespCamel = _mapKeys(proofResp, (v, k) => _camelCase(k))
+              proofsResponse.push(proofRespCamel)
+            })
+          } catch (err) {
+            reject(err)
+            return callback(err)
+          }
+
+          resolve(proofsResponse)
+          return callback(null, proofsResponse)
+        },
+        function(err) {
           reject(err)
           return callback(err)
         }
-
-        resolve(proofsResponse)
-        return callback(null, proofsResponse)
-      }, function (err) {
-        reject(err)
-        return callback(err)
-      })
+      )
     } catch (err) {
       reject(err)
       return callback(err)
@@ -517,8 +619,8 @@ function getProofs (proofHandles, callback) {
  * @param {function} callback - An optional callback function.
  * @return {Array<Object>} - An Array of Objects, one for each proof submitted, with vefification info.
  */
-function verifyProofs (proofs, uri, callback) {
-  callback = callback || function () { }
+function verifyProofs(proofs, uri, callback) {
+  callback = callback || function() {}
 
   let evaluatedProofs = evaluateProofs(proofs)
 
@@ -530,101 +632,123 @@ function verifyProofs (proofs, uri, callback) {
     nodesPromise = getNodes(1)
   } else {
     if (!_isString(uri)) throw new Error('uri arg must be a String')
-    if (!_isValidNodeURI(uri)) throw new Error(`uri arg contains invalid Node URI : ${uri}`)
+    if (!_isValidNodeURI(uri))
+      throw new Error(`uri arg contains invalid Node URI : ${uri}`)
     nodesPromise = Promise.resolve([uri])
   }
 
-  return new Promise(function (resolve, reject) {
+  const rejectUnauthorized = this.rejectUnauthorized
+  return new Promise(function(resolve, reject) {
     try {
-      nodesPromise.then((nodes) => {
-        return _first(nodes)
-      }).then(node => {
-        // Assign all flat proofs to the same Node URI for verification
-        let singleNodeFlatProofs = _map(evaluatedProofs, proof => {
-          let oldProofURI = url.parse(proof.uri)
-          proof.uri = node + oldProofURI.path
-          return proof
+      nodesPromise
+        .then(nodes => {
+          return _first(nodes)
         })
-
-        let uniqSingleNodeFlatProofs = _uniqWith(singleNodeFlatProofs, _isEqual)
-
-        return uniqSingleNodeFlatProofs
-      }).then(flatProofs => {
-        let anchorURIs = []
-        _forEach(flatProofs, proof => {
-          anchorURIs.push(proof.uri)
-        })
-
-        let uniqAnchorURIs = _uniq(anchorURIs)
-
-        let nodesWithGetOpts = _map(uniqAnchorURIs, anchorURI => {
-          return {
-            method: 'GET',
-            uri: anchorURI,
-            body: {},
-            headers: {
-              'content-type': 'application/json'
-            },
-            timeout: 10000,
-            json: true
-          }
-        })
-
-        return [flatProofs, nodesWithGetOpts]
-      }).then(([flatProofs, nodesWithGetOpts]) => {
-        // Perform parallel GET requests to all Nodes with proofs
-        let hashesByNodeURI = Promise.map(nodesWithGetOpts, rp, { concurrency: 25 }).then(parsedBody => {
-          // Promise.map returns an Array entry for each host it submits to.
-          let flatParsedBody = _flatten(parsedBody)
-
-          let r = {}
-
-          _forEach(nodesWithGetOpts, (getOpt, index) => {
-            r[getOpt.uri] = flatParsedBody[index]
+        .then(node => {
+          // Assign all flat proofs to the same Node URI for verification
+          let singleNodeFlatProofs = _map(evaluatedProofs, proof => {
+            let oldProofURI = url.parse(proof.uri)
+            proof.uri = node + oldProofURI.path
+            return proof
           })
 
-          return r
-        }).catch(err => {
-          reject(err)
-          return callback(err)
+          let uniqSingleNodeFlatProofs = _uniqWith(
+            singleNodeFlatProofs,
+            _isEqual
+          )
+
+          return uniqSingleNodeFlatProofs
         })
+        .then(flatProofs => {
+          let anchorURIs = []
+          _forEach(flatProofs, proof => {
+            anchorURIs.push(proof.uri)
+          })
 
-        return [flatProofs, hashesByNodeURI]
-      }).then(([flatProofs, hashesByNodeURI]) => {
-        // Fulfill the Promise for all of the request results.
-        hashesByNodeURI.then(hashesFound => {
-          if (_isEmpty(hashesFound)) return Promise.reject(new Error('No hashes were found.'))
-          let results = []
+          let uniqAnchorURIs = _uniq(anchorURIs)
 
-          _forEach(flatProofs, flatProof => {
-            if (flatProof.expected_value === hashesFound[flatProof.uri]) {
-                // IT'S GOOD!
-              flatProof.verified = true
-              flatProof.verified_at = new Date().toISOString().slice(0, 19) + 'Z'
-            } else {
-                // IT'S NO GOOD :-(
-              flatProof.verified = false
-              flatProof.verified_at = null
+          let nodesWithGetOpts = _map(uniqAnchorURIs, anchorURI => {
+            return {
+              method: 'GET',
+              uri: anchorURI,
+              body: {},
+              headers: {
+                'content-type': 'application/json'
+              },
+              timeout: 10000,
+              json: true,
+              rejectUnauthorized
             }
-
-              // Camel case object keys
-            let flatProofCamel = _mapKeys(flatProof, (v, k) => _camelCase(k))
-
-            results.push(flatProofCamel)
           })
 
-          resolve(results)
-          return callback(null, results)
-        }).catch(err => {
+          return [flatProofs, nodesWithGetOpts]
+        })
+        .then(([flatProofs, nodesWithGetOpts]) => {
+          // Perform parallel GET requests to all Nodes with proofs
+          let hashesByNodeURI = Promise.map(nodesWithGetOpts, rp, {
+            concurrency: 25
+          })
+            .then(parsedBody => {
+              // Promise.map returns an Array entry for each host it submits to.
+              let flatParsedBody = _flatten(parsedBody)
+
+              let r = {}
+
+              _forEach(nodesWithGetOpts, (getOpt, index) => {
+                r[getOpt.uri] = flatParsedBody[index]
+              })
+
+              return r
+            })
+            .catch(err => {
+              reject(err)
+              return callback(err)
+            })
+
+          return [flatProofs, hashesByNodeURI]
+        })
+        .then(([flatProofs, hashesByNodeURI]) => {
+          // Fulfill the Promise for all of the request results.
+          hashesByNodeURI
+            .then(hashesFound => {
+              if (_isEmpty(hashesFound))
+                return Promise.reject(new Error('No hashes were found.'))
+              let results = []
+
+              _forEach(flatProofs, flatProof => {
+                if (flatProof.expected_value === hashesFound[flatProof.uri]) {
+                  // IT'S GOOD!
+                  flatProof.verified = true
+                  flatProof.verified_at =
+                    new Date().toISOString().slice(0, 19) + 'Z'
+                } else {
+                  // IT'S NO GOOD :-(
+                  flatProof.verified = false
+                  flatProof.verified_at = null
+                }
+
+                // Camel case object keys
+                let flatProofCamel = _mapKeys(flatProof, (v, k) =>
+                  _camelCase(k)
+                )
+
+                results.push(flatProofCamel)
+              })
+
+              resolve(results)
+              return callback(null, results)
+            })
+            .catch(err => {
+              console.error(err.message)
+              reject(err)
+              return callback(err)
+            })
+        })
+        .catch(err => {
           console.error(err.message)
           reject(err)
           return callback(err)
         })
-      }).catch(err => {
-        console.error(err.message)
-        reject(err)
-        return callback(err)
-      })
     } catch (err) {
       reject(err)
       return callback(err)
@@ -637,7 +761,7 @@ function verifyProofs (proofs, uri, callback) {
  *
  * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be evaluated. Proofs can be in any of the supported JSON-LD or Binary formats.
  */
-function evaluateProofs (proofs) {
+function evaluateProofs(proofs) {
   // Validate proofs arg
   if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
   if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
@@ -648,14 +772,23 @@ function evaluateProofs (proofs) {
     if (_isObject(proof) && _has(proof, 'proof') && _isString(proof.proof)) {
       // Probably result of `submitProofs()` call. Extract proof String
       return proof.proof
-    } else if (_isObject(proof) && _has(proof, 'type') && proof.type === 'Chainpoint') {
+    } else if (
+      _isObject(proof) &&
+      _has(proof, 'type') &&
+      proof.type === 'Chainpoint'
+    ) {
       // Probably a JS Object Proof
       return proof
-    } else if (_isString(proof) && (validator.isJSON(proof) || validator.isBase64(proof))) {
+    } else if (
+      _isString(proof) &&
+      (validator.isJSON(proof) || validator.isBase64(proof))
+    ) {
       // Probably a JSON String or Base64 encoded binary proof
       return proof
     } else {
-      throw new Error('proofs arg Array has elements that are not Objects or Strings')
+      throw new Error(
+        'proofs arg Array has elements that are not Objects or Strings'
+      )
     }
   })
 
@@ -671,5 +804,6 @@ module.exports = {
   submitHashes: submitHashes,
   getProofs: getProofs,
   verifyProofs: verifyProofs,
-  evaluateProofs: evaluateProofs
+  evaluateProofs: evaluateProofs,
+  rejectUnauthorized: true
 }
