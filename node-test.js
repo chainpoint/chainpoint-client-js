@@ -1,6 +1,11 @@
 const chp = require('./dist/bundle')
 // const dns = require('dns')
 
+// By default, calls to secure nodes with self-signed certificates fail with
+// Error: unable to verify the first certificate. To enable calls to these
+// nodes, set the `rejectUnauthorized` property of your client instance to false:
+// chp.rejectUnauthorized = false
+
 async function runIt() {
   console.log('====================================')
   console.log('runit()')
