@@ -1,14 +1,21 @@
 const chp = require('./dist/bundle')
 // const dns = require('dns')
 
-async function runIt () {
+// By default, calls to secure nodes with self-signed certificates fail with
+// Error: unable to verify the first certificate. To enable calls to these
+// nodes, set the `rejectUnauthorized` property of your client instance to false:
+// chp.rejectUnauthorized = false
+
+async function runIt() {
   console.log('====================================')
   console.log('runit()')
   console.log('====================================')
   // A few sample SHA-256 proofs to anchor
-  let hashes = ['1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+  let hashes = [
+    '1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
     '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
-    '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a']
+    '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'
+  ]
 
   // Submit each hash to three randomly selected Nodes
   let proofHandles = await chp.submitHashes(hashes)
