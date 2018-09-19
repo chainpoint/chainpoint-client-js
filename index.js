@@ -48,7 +48,7 @@ const rp = require('request-promise')
 const crypto = require('crypto')
 const fs = require('fs')
 
-const NODE_PROXY_URI = 'http://node-proxy.chainpoint.org'
+const NODE_PROXY_URI = 'https://node-proxy.chainpoint.org:443'
 
 Promise.config({
   // Enables all warnings except forgotten return statements.
@@ -435,21 +435,19 @@ function submitHashes(hashes, uris, callback) {
   }
 
   return new Promise(function(resolve, reject) {
+    const secureOrigin =
+      typeof window === 'object' && window.location.protocol === 'https:'
+
     // Resolve an Array of Nodes from service discovery or the arg provided
     nodesPromise
       .then(nodes => {
         // Setup an options Object for each Node we'll submit hashes to.
         // Each Node will then be sent the full Array of hashes.
         let nodesWithPostOpts = _map(nodes, node => {
-          let uri =
-            typeof window === 'object' && window.origin.startsWith('https:')
-              ? NODE_PROXY_URI
-              : node
+          let uri = secureOrigin ? NODE_PROXY_URI : node
           let headers = Object.assign(
             { 'content-type': 'application/json' },
-            typeof window === 'object' && window.origin.startsWith('https:')
-              ? { 'X-Node-Uri': node }
-              : {}
+            secureOrigin ? { 'X-Node-Uri': node } : {}
           )
 
           let postOptions = {
