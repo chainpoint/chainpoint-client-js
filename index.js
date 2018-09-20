@@ -164,6 +164,14 @@ function _isValidNodeURI(nodeURI) {
 }
 
 /**
+ * Check if client is being used over an https connection
+ * @returns {bool} true if served over https
+ */
+function _isSecureOrigin() {
+  return typeof window === 'object' && window.location.protocol === 'https:'
+}
+
+/**
  * Retrieve an Array of discovered Node URIs. Returns three Node URIs by default.
  * Can only return up to the number of Nodes that Core provides.
  *
@@ -435,19 +443,16 @@ function submitHashes(hashes, uris, callback) {
   }
 
   return new Promise(function(resolve, reject) {
-    const secureOrigin =
-      typeof window === 'object' && window.location.protocol === 'https:'
-
     // Resolve an Array of Nodes from service discovery or the arg provided
     nodesPromise
       .then(nodes => {
         // Setup an options Object for each Node we'll submit hashes to.
         // Each Node will then be sent the full Array of hashes.
         let nodesWithPostOpts = _map(nodes, node => {
-          let uri = secureOrigin ? NODE_PROXY_URI : node
+          let uri = _isSecureOrigin() ? NODE_PROXY_URI : node
           let headers = Object.assign(
             { 'content-type': 'application/json' },
-            secureOrigin ? { 'X-Node-Uri': node } : {}
+            _isSecureOrigin() ? { 'X-Node-Uri': node } : {}
           )
 
           let postOptions = {
@@ -661,14 +666,16 @@ function getProofs(proofHandles, callback) {
       // the `hashids` header with a list of all hash ID's to retrieve
       // proofs for from that Node.
       let nodesWithGetOpts = _map(_keys(uuidsByNode), node => {
+        let headers = Object.assign(
+          { 'content-type': 'application/json' },
+          { hashids: uuidsByNode[node].join(',') },
+          _isSecureOrigin() ? { 'X-Node-Uri': node } : {}
+        )
         let getOptions = {
           method: 'GET',
-          uri: node + '/proofs',
+          uri: (_isSecureOrigin() ? NODE_PROXY_URI : node) + '/proofs',
           body: {},
-          headers: {
-            'content-type': 'application/json',
-            hashids: uuidsByNode[node].join(',')
-          },
+          headers,
           timeout: 10000,
           json: true
         }
@@ -767,13 +774,16 @@ function verifyProofs(proofs, uri, callback) {
           let uniqAnchorURIs = _uniq(anchorURIs)
 
           let nodesWithGetOpts = _map(uniqAnchorURIs, anchorURI => {
+            let headers = Object.assign(
+              { 'content-type': 'application/json' },
+              _isSecureOrigin() ? { 'X-Node-Uri': anchorURI } : {}
+            )
+
             return {
               method: 'GET',
-              uri: anchorURI,
+              uri: _isSecureOrigin() ? NODE_PROXY_URI : anchorURI,
               body: {},
-              headers: {
-                'content-type': 'application/json'
-              },
+              headers,
               timeout: 10000,
               json: true
             }
