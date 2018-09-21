@@ -776,12 +776,23 @@ function verifyProofs(proofs, uri, callback) {
           let nodesWithGetOpts = _map(uniqAnchorURIs, anchorURI => {
             let headers = Object.assign(
               { 'content-type': 'application/json' },
-              _isSecureOrigin() ? { 'X-Node-Uri': anchorURI } : {}
+              _isSecureOrigin()
+                ? {
+                    'X-Node-Uri':
+                      url.parse(anchorURI).protocol +
+                      '//' +
+                      url.parse(anchorURI).host
+                  }
+                : {}
             )
+
+            let uri = _isSecureOrigin()
+              ? NODE_PROXY_URI + url.parse(anchorURI).path
+              : anchorURI
 
             return {
               method: 'GET',
-              uri: _isSecureOrigin() ? NODE_PROXY_URI : anchorURI,
+              uri,
               body: {},
               headers,
               timeout: 10000,
