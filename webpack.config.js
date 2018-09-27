@@ -29,6 +29,7 @@ let base = {
 }
 
 let web = {
+  target: 'web',
   node: {
     dgram: 'empty',
     fs: 'empty',
