@@ -7,11 +7,11 @@
 
 ## About
 
-A client for creating and verifying [Chainpoint](https://chainpoint.org) proofs using the [Tierion](https://tierion.com) Network.
+A client for creating and verifying [Chainpoint](https://chainpoint.org) proofs.
 
-The Chainpoint Client handles communication with a distributed network of Nodes that make up the Tierion Network.
+The Chainpoint Client handles communication with a distributed network of Nodes that make up the Chainpoint Network.
 
-The Chainpoint Client lets you submit hashes to a Chainpoint Node on the Tierion Network. Nodes periodically aggregate hashes and send data to Tierion Core for anchoring the hash to public blockchains.
+The Chainpoint Client lets you submit hashes to a Chainpoint Node on the Chainpoint Network. Nodes periodically aggregate hashes and send data to Core for anchoring the hash to public blockchains.
 
 The Chainpoint Client lets you retrieve and verify a Chainpoint proof. Each proof cryptographically proves the integrity and existence of data at a point in time.
 
