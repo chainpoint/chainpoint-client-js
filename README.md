@@ -130,6 +130,56 @@ Example Return Value
 ]
 ```
 
+### `submitFileHashes(paths, uris, callback)`
+
+#### Description
+
+Use this function to submit hashes calculated from an Array of file paths, and receive back the information needed to later retrieve a proof for each of those hashes using the `getProofs()` function.
+
+By default hashes are submitted to three Nodes to help ensure a proof will become available at the appropriate time. Only one such proof need be permanently stored, the others provide redundancy.
+
+#### Arguments
+
+The `paths` argument expects an Array of valid file paths.
+
+The SHA-256 cryptographic one-way hash function will be used on all files in the paths submitted.
+
+The optional `uris` argument accepts an Array of Node URI's as returned by the `getNodes()` function. Each element of the returned Array is a full URI with `scheme://hostname[:port]` (e.g. `http://127.0.0.1` or `http://127.0.0.1:80`).
+
+#### Return Values
+
+The return value from this function is an Array of Objects, one for each hash submitted. Each result Object has the information needed to retrieve a proof for a submitted hash. There will be one Object for every Node a hash was submitted to.
+
+The Array of Objects, referred to as `proofHandles` can also be submitted directly as the argument to the `getProofs()` function. It typically takes about 10 seconds for initial Calendar proofs to become available.
+
+The Object will contain:
+
+`uri` : The URI of the Node(s) the hash was submitted to. This is the only Node that can retrieve this particular proof.
+
+`hash` : A copy of the hash that was originally submitted that will be embedded in a future proof. This allows for easier correlation between hashes submitted and the Hash ID handle needed to retrieve a proof.
+
+`hashIdNode` : The Version 1 UUID that can be used to retrieve the proof for a submitted hash from the `/proofs/:id` endpoint of the Node it was submitted to.
+
+`path` : The path of the file represented by this object.
+
+Example Return Value
+
+```javascript
+[
+  {
+    "uri": "http://0.0.0.0",
+    "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
+    "hashIdNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34",
+    "path": "./datafile.json"
+  },
+  {
+    "uri": "http://0.0.0.0",
+    "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
+    "hashIdNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15",
+    "path": "./folder/otherfile.csv"
+  }
+]
+```
 ### `getProofs(proofHandles, callback)`
 
 #### Description

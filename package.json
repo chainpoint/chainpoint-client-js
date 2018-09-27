@@ -1,6 +1,6 @@
 {
   "name": "chainpoint-client",
-  "version": "0.1.5",
+  "version": "0.2.2",
   "description": "Chainpoint API client",
   "main": "dist/bundle.js",
   "author": "Glenn Rempe <glenn@tierion.com>",
@@ -17,7 +17,11 @@
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
+    "eslint": "^5.6.0",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-plugin-prettier": "^2.6.2",
     "node-libs-browser": "^2.1.0",
+    "prettier": "^1.14.3",
     "uglifyjs-webpack-plugin": "^1.2.0",
     "webpack": "^3.11"
   },
