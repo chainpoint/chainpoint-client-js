@@ -1,4 +1,4 @@
-# Chainpoint Client (Javascript)
+# Chainpoint Client (JavaScript)
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
@@ -15,11 +15,11 @@ The Chainpoint Client lets you submit hashes to a Chainpoint Node on the Chainpo
 
 The Chainpoint Client lets you retrieve and verify a Chainpoint proof. Each proof cryptographically proves the integrity and existence of data at a point in time.
 
-This client can be used in both Browser and Node.js based Javascript applications using `callback` functions, Promises (using `.then`, `.catch`), or Promises (using `async`/`await`) functional styles.
+This client can be used in both Browser and Node.js based JavaScript applications using `callback` functions, Promises (using `.then`, `.catch`), or Promises (using `async`/`await`) functional styles.
 
 ## Proof Creation and Verification Overview
 
-Creating a Chainpoint proof is an asynchronous process. This client handles all the steps for submitting hashes, retreiving proofs, and verifying proofs.
+Creating a Chainpoint proof is an asynchronous process. This client handles all the steps for submitting hashes, retrieving proofs, and verifying proofs.
 
 ### Submit Hash(es)
 
@@ -188,7 +188,7 @@ This function is used to retrieve Chainpoint proofs from the Nodes that are resp
 
 #### Arguments
 
-The `proofHandles` argument accepts an Array of Objects. Each object must have the `uri` and `hashIdNode` proprties. The argument is of the same form as the output from the `submitHashes()` function.
+The `proofHandles` argument accepts an Array of Objects. Each object must have the `uri` and `hashIdNode` properties. The argument is of the same form as the output from the `submitHashes()` function.
 
 The `uri` property should be the base URI (e.g. `http://0.0.0.0`) of an online Node that is responsible for generating a particular proof.
 
@@ -383,7 +383,7 @@ This function returns an Array of String URIs. The list of Nodes returned are fo
 
 ## Usage : Functional Styles
 
-This client can be used with several popular Javascript API styles in both Node.js and the Browser.
+This client can be used with several popular JavaScript API styles in both Node.js and the Browser.
 The choice of API style is left to the developer and should be based on support for
 each style in the intended runtime platform and the developer's preference.
 
@@ -446,7 +446,7 @@ async function runIt () {
 runIt()
 ```
 
-### Javascript Client-Side Frameworks Example
+### JavaScript Client-Side Frameworks Example
 
 Note: If you are using any client-side JavaScript framework (ex. Angular, React, etc) remember to import chainpoint-client in the following manner:
 
