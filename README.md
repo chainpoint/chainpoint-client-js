@@ -1,7 +1,5 @@
 # Chainpoint Client (JavaScript)
 
-[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
-
 [![npm](https://img.shields.io/npm/l/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
 [![npm](https://img.shields.io/npm/v/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
 
@@ -462,12 +460,7 @@ const chainpoint = require('chainpoint-client/dist/bundle.web')
 
 ### Browser Script Tag Example
 
-Note : You can copy `dist/bundle.web.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
-
-```html
-  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/9db515aa5a4380181feb287bf4ed474ed86eb010/dist/bundle.web.js"></script>
-
-```
+You can copy `dist/bundle.web.js` into your app to be served from your own web server and included in a script tag.
 
 Or install the `npm` package in a place available to your web server pages and set the `script src` tag as shown in the example below. A set of window global functions (e.g. `chainpointClient.submitHashes()`) will then be available for use in a fashion similar to that shown in the examples above.
 
