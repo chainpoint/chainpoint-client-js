@@ -282,30 +282,25 @@ function _isValidUUID(uuid) {
  * @returns {Array<{uri: String, hash: String, hashIdNode: String}>} An Array of proofHandles
  */
 function _mapSubmitHashesRespToProofHandles(respArray) {
-  if (!_isArray(respArray))
+  if (!_isArray(respArray) && !respArray.length)
     throw new Error('_mapSubmitHashesRespToProofHandles arg must be an Array')
 
   let proofHandles = []
-  let groupIdMap = {}
-  let getGroupId = _curry(function(map, hash) {
-    let key = `${hash.hash}${hash.path ? `|${hash.path}` : ''}`
-    if (groupIdMap[key] !== undefined) return groupIdMap[key]
-    else {
-      let groupId = uuidv1()
-      groupIdMap[key] = groupId
-
-      return groupId
-    }
-  })(groupIdMap)
+  let groupIdList = []
+  if (respArray[0] && respArray[0].hashes) {
+    _forEach(respArray[0].hashes, () => {
+      groupIdList.push(uuidv1())
+    })
+  }
 
   _forEach(respArray, resp => {
-    _forEach(resp.hashes, hash => {
+    _forEach(resp.hashes, (hash, idx) => {
       let handle = {}
 
       handle.uri = resp.meta.submitted_to
       handle.hash = hash.hash
       handle.hashIdNode = hash.hash_id_node
-      handle.groupId = getGroupId(hash)
+      handle.groupId = groupIdList[idx]
       proofHandles.push(handle)
     })
   })
