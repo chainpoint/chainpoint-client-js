@@ -32,6 +32,7 @@
     "lodash": "^4.17.4",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
+    "uuid": "^3.3.2",
     "uuid-validate": "^0.0.2",
     "validator": "^9.1.2"
   }
