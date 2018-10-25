@@ -111,7 +111,7 @@ The Object will contain:
 
 `hashIdNode` : The Version 1 UUID that can be used to retrieve the proof for a submitted hash from the `/proofs/:id` endpoint of the Node it was submitted to.
 
-`groupId` : A Version 1 UUID which is used to group Proof Handles that have the same corresponding hash. The groupId is later used by the getProofs function to optimize the proof retrieval process.
+`groupId` : A Version 1 UUID which is used to group Proof Handles that have the same corresponding hash. The groupId can later be used to optimize the proof retrieval process.
 
 Example Return Value
 
@@ -164,7 +164,7 @@ The Object will contain:
 
 `path` : The path of the file represented by this object.
 
-`groupId` : A Version 1 UUID which is used to group Proof Handles that have the same corresponding hash. The groupId is later used by the getProofs function to optimize the proof retrieval process.
+`groupId` : A Version 1 UUID which is used to group Proof Handles that have the same corresponding hash. The groupId can later be used to optimize the proof retrieval process.
 
 Example Return Value
 
