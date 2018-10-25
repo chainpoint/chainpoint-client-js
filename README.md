@@ -111,19 +111,23 @@ The Object will contain:
 
 `hashIdNode` : The Version 1 UUID that can be used to retrieve the proof for a submitted hash from the `/proofs/:id` endpoint of the Node it was submitted to.
 
+`groupId` : A Version 1 UUID which is used to group Proof Handles that have the same corresponding hash. The groupId is later used by the getProofs function to optimize the proof retrieval process.
+
 Example Return Value
 
 ```javascript
 [
   {
     "uri": "http://0.0.0.0",
-    "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
-    "hashIdNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34"
+    "hash": "1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
+    "hashIdNode": "df500460-d7d1-11e8-992b-0178d9540713",
+    "groupId": "dfa4b410-d7d1-11e8-a6e3-c763418c848e"
   },
   {
     "uri": "http://0.0.0.0",
-    "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
-    "hashIdNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15"
+    "hash": "2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
+    "hashIdNode": "df502b70-d7d1-11e8-992b-0187b4b6e491",
+    "groupId": "dfa4b411-d7d1-11e8-a6e3-c763418c848e"
   }
 ]
 ```
@@ -160,6 +164,8 @@ The Object will contain:
 
 `path` : The path of the file represented by this object.
 
+`groupId` : A Version 1 UUID which is used to group Proof Handles that have the same corresponding hash. The groupId is later used by the getProofs function to optimize the proof retrieval process.
+
 Example Return Value
 
 ```javascript
@@ -168,13 +174,15 @@ Example Return Value
     "uri": "http://0.0.0.0",
     "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
     "hashIdNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34",
-    "path": "./datafile.json"
+    "path": "./datafile.json",
+    "groupId": "dc1c8cd0-d7d3-11e8-8a5c-7fe62f82e5c3"
   },
   {
     "uri": "http://0.0.0.0",
     "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
     "hashIdNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15",
-    "path": "./folder/otherfile.csv"
+    "path": "./folder/otherfile.csv",
+    "groupId": "dc1c8cd1-d7d3-11e8-8a5c-7fe62f82e5c3"
   }
 ]
 ```
