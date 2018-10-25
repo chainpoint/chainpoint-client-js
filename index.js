@@ -1,14 +1,14 @@
 /* Copyright 2017-2018 Tierion
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*     http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 'use strict'
 
@@ -35,7 +35,8 @@ import {
   mapKeys as _mapKeys,
   camelCase as _camelCase,
   uniqWith as _uniqWith,
-  isEqual as _isEqual
+  isEqual as _isEqual,
+  curry as _curry
 } from 'lodash'
 const Promise = require('bluebird')
 const dns = require('dns')
@@ -47,6 +48,7 @@ const request = require('request')
 const rp = require('request-promise')
 const crypto = require('crypto')
 const fs = require('fs')
+const uuidv1 = require('uuid/v1')
 
 const NODE_PROXY_URI = 'https://node-proxy.chainpoint.org:443'
 
@@ -191,7 +193,11 @@ function getNodes(num, callback) {
       .then(coreURI => {
         let getNodeURI = _first(coreURI) + '/nodes/random'
         request(
-          { uri: getNodeURI, json: true, timeout: 10000 },
+          {
+            uri: getNodeURI,
+            json: true,
+            timeout: 10000
+          },
           (err, response, body) => {
             if (err) {
               reject(err)
@@ -276,17 +282,25 @@ function _isValidUUID(uuid) {
  * @returns {Array<{uri: String, hash: String, hashIdNode: String}>} An Array of proofHandles
  */
 function _mapSubmitHashesRespToProofHandles(respArray) {
-  if (!_isArray(respArray))
+  if (!_isArray(respArray) && !respArray.length)
     throw new Error('_mapSubmitHashesRespToProofHandles arg must be an Array')
 
   let proofHandles = []
+  let groupIdList = []
+  if (respArray[0] && respArray[0].hashes) {
+    _forEach(respArray[0].hashes, () => {
+      groupIdList.push(uuidv1())
+    })
+  }
 
   _forEach(respArray, resp => {
-    _forEach(resp.hashes, hash => {
+    _forEach(resp.hashes, (hash, idx) => {
       let handle = {}
+
       handle.uri = resp.meta.submitted_to
       handle.hash = hash.hash
       handle.hashIdNode = hash.hash_id_node
+      handle.groupId = groupIdList[idx]
       proofHandles.push(handle)
     })
   })
@@ -396,7 +410,7 @@ function _flattenProofBranches(proofBranchArray) {
  * Submit hash(es) to one or more Nodes, returning an Array of proof handle objects, one for each submitted hash and Node combination.
  * @param {Array<String>} hashes - An Array of String Hashes in Hexadecimal form.
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
- * @return {Array<{uri: String, hash: String, hashIdNode: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
+ * @return {Array<{uri: String, hash: String, hashIdNode: String, groupId: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
  */
 function submitHashes(hashes, uris, callback) {
   uris = uris || []
@@ -451,8 +465,14 @@ function submitHashes(hashes, uris, callback) {
         let nodesWithPostOpts = _map(nodes, node => {
           let uri = _isSecureOrigin() ? NODE_PROXY_URI : node
           let headers = Object.assign(
-            { 'content-type': 'application/json' },
-            _isSecureOrigin() ? { 'X-Node-Uri': node } : {}
+            {
+              'content-type': 'application/json'
+            },
+            _isSecureOrigin()
+              ? {
+                  'X-Node-Uri': node
+                }
+              : {}
           )
 
           let postOptions = {
@@ -469,7 +489,9 @@ function submitHashes(hashes, uris, callback) {
         })
 
         // All requests succeed in parallel or all fail.
-        Promise.map(nodesWithPostOpts, rp, { concurrency: 25 }).then(
+        Promise.map(nodesWithPostOpts, rp, {
+          concurrency: 25
+        }).then(
           parsedBody => {
             // Nodes cannot be guaranteed to know what IP address they are reachable
             // at, so we need to amend each result with the Node URI it was submitted
@@ -504,7 +526,7 @@ function submitHashes(hashes, uris, callback) {
  * Submit hash(es) of selected file(s) to one or more Nodes, returning an Array of proof handle objects, one for each submitted hash and Node combination.
  * @param {Array<String>} paths - An Array of paths of the files to be hashed.
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
- * @return {Array<{path: String, uri: String, hash: String, hashIdNode: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
+ * @return {Array<{path: String, uri: String, hash: String, hashIdNode: String, groupId: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
  */
 function submitFileHashes(paths, uris, callback) {
   callback = callback || function() {}
@@ -582,11 +604,18 @@ function sha256FileByPath(path) {
     readStream.on('data', data => sha256.update(data))
     readStream.on('end', () => {
       let hash = sha256.digest('hex')
-      resolve({ path, hash })
+      resolve({
+        path,
+        hash
+      })
     })
     readStream.on('error', err => {
       if (err.code === 'EACCES') {
-        resolve({ path: path, hash: null, error: 'EACCES' })
+        resolve({
+          path: path,
+          hash: null,
+          error: 'EACCES'
+        })
       }
       reject(err)
     })
@@ -667,9 +696,17 @@ function getProofs(proofHandles, callback) {
       // proofs for from that Node.
       let nodesWithGetOpts = _map(_keys(uuidsByNode), node => {
         let headers = Object.assign(
-          { 'content-type': 'application/json' },
-          { hashids: uuidsByNode[node].join(',') },
-          _isSecureOrigin() ? { 'X-Node-Uri': node } : {}
+          {
+            'content-type': 'application/json'
+          },
+          {
+            hashids: uuidsByNode[node].join(',')
+          },
+          _isSecureOrigin()
+            ? {
+                'X-Node-Uri': node
+              }
+            : {}
         )
         let getOptions = {
           method: 'GET',
@@ -683,7 +720,9 @@ function getProofs(proofHandles, callback) {
       })
 
       // Perform parallel GET requests to all Nodes with proofs
-      Promise.map(nodesWithGetOpts, rp, { concurrency: 25 }).then(
+      Promise.map(nodesWithGetOpts, rp, {
+        concurrency: 25
+      }).then(
         function(parsedBody) {
           // Promise.map returns an Array entry for each host it submits to.
           let flatParsedBody = _flatten(parsedBody)
@@ -775,7 +814,9 @@ function verifyProofs(proofs, uri, callback) {
 
           let nodesWithGetOpts = _map(uniqAnchorURIs, anchorURI => {
             let headers = Object.assign(
-              { 'content-type': 'application/json' },
+              {
+                'content-type': 'application/json'
+              },
               _isSecureOrigin()
                 ? {
                     'X-Node-Uri':

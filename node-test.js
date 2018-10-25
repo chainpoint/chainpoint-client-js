@@ -2,15 +2,17 @@ const chp = require('./dist/bundle')
 const fs = require('fs')
 // const dns = require('dns')
 
-async function runIt () {
+async function runIt() {
   console.log('====================================')
   console.log('runit()')
   console.log('====================================')
 
   // A few sample SHA-256 proofs to anchor
-  let hashes = ['1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+  let hashes = [
+    '1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
     '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
-    '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a']
+    '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'
+  ]
 
   // Submit each hash to three randomly selected Nodes
   let proofHandlesHashes = await chp.submitHashes(hashes)
@@ -18,7 +20,10 @@ async function runIt () {
   console.log(proofHandlesHashes)
 
   // And test the submitFileHashes method
-  let paths = fs.readdirSync('./').map(file => `./${file}`).filter((file) => fs.lstatSync(file).isFile())
+  let paths = fs
+    .readdirSync('./')
+    .map(file => `./${file}`)
+    .filter(file => fs.lstatSync(file).isFile())
 
   // Submit each hash to three randomly selected Nodes
   let proofHandlesFiles = await chp.submitFileHashes(paths)
@@ -30,7 +35,10 @@ async function runIt () {
   await new Promise(resolve => setTimeout(resolve, 16000))
 
   // Retrieve a Calendar proof for each hash that was submitted
-  let proofs = await chp.getProofs([...proofHandlesHashes, ...proofHandlesFiles])
+  let proofs = await chp.getProofs([
+    ...proofHandlesHashes,
+    ...proofHandlesFiles
+  ])
   console.log('Proof Objects: Expand objects below to inspect.')
   console.log(proofs)
 

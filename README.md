@@ -1,6 +1,4 @@
-# Chainpoint Client (Javascript)
-
-[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+# Chainpoint Client (JavaScript)
 
 [![npm](https://img.shields.io/npm/l/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
 [![npm](https://img.shields.io/npm/v/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
@@ -15,11 +13,11 @@ The Chainpoint Client lets you submit hashes to a Chainpoint Node on the Chainpo
 
 The Chainpoint Client lets you retrieve and verify a Chainpoint proof. Each proof cryptographically proves the integrity and existence of data at a point in time.
 
-This client can be used in both Browser and Node.js based Javascript applications using `callback` functions, Promises (using `.then`, `.catch`), or Promises (using `async`/`await`) functional styles.
+This client can be used in both Browser and Node.js based JavaScript applications using `callback` functions, Promises (using `.then`, `.catch`), or Promises (using `async`/`await`) functional styles.
 
 ## Proof Creation and Verification Overview
 
-Creating a Chainpoint proof is an asynchronous process. This client handles all the steps for submitting hashes, retreiving proofs, and verifying proofs.
+Creating a Chainpoint proof is an asynchronous process. This client handles all the steps for submitting hashes, retrieving proofs, and verifying proofs.
 
 ### Submit Hash(es)
 
@@ -113,19 +111,23 @@ The Object will contain:
 
 `hashIdNode` : The Version 1 UUID that can be used to retrieve the proof for a submitted hash from the `/proofs/:id` endpoint of the Node it was submitted to.
 
+`groupId` : A Version 1 UUID which is used to group Proof Handles that have the same corresponding hash. The groupId can later be used to optimize the proof retrieval process.
+
 Example Return Value
 
 ```javascript
 [
   {
     "uri": "http://0.0.0.0",
-    "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
-    "hashIdNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34"
+    "hash": "1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
+    "hashIdNode": "df500460-d7d1-11e8-992b-0178d9540713",
+    "groupId": "dfa4b410-d7d1-11e8-a6e3-c763418c848e"
   },
   {
     "uri": "http://0.0.0.0",
-    "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
-    "hashIdNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15"
+    "hash": "2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
+    "hashIdNode": "df502b70-d7d1-11e8-992b-0187b4b6e491",
+    "groupId": "dfa4b411-d7d1-11e8-a6e3-c763418c848e"
   }
 ]
 ```
@@ -162,6 +164,8 @@ The Object will contain:
 
 `path` : The path of the file represented by this object.
 
+`groupId` : A Version 1 UUID which is used to group Proof Handles that have the same corresponding hash. The groupId can later be used to optimize the proof retrieval process.
+
 Example Return Value
 
 ```javascript
@@ -170,13 +174,15 @@ Example Return Value
     "uri": "http://0.0.0.0",
     "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
     "hashIdNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34",
-    "path": "./datafile.json"
+    "path": "./datafile.json",
+    "groupId": "dc1c8cd0-d7d3-11e8-8a5c-7fe62f82e5c3"
   },
   {
     "uri": "http://0.0.0.0",
     "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
     "hashIdNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15",
-    "path": "./folder/otherfile.csv"
+    "path": "./folder/otherfile.csv",
+    "groupId": "dc1c8cd1-d7d3-11e8-8a5c-7fe62f82e5c3"
   }
 ]
 ```
@@ -188,7 +194,7 @@ This function is used to retrieve Chainpoint proofs from the Nodes that are resp
 
 #### Arguments
 
-The `proofHandles` argument accepts an Array of Objects. Each object must have the `uri` and `hashIdNode` proprties. The argument is of the same form as the output from the `submitHashes()` function.
+The `proofHandles` argument accepts an Array of Objects. Each object must have the `uri` and `hashIdNode` properties. The argument is of the same form as the output from the `submitHashes()` function.
 
 The `uri` property should be the base URI (e.g. `http://0.0.0.0`) of an online Node that is responsible for generating a particular proof.
 
@@ -383,7 +389,7 @@ This function returns an Array of String URIs. The list of Nodes returned are fo
 
 ## Usage : Functional Styles
 
-This client can be used with several popular Javascript API styles in both Node.js and the Browser.
+This client can be used with several popular JavaScript API styles in both Node.js and the Browser.
 The choice of API style is left to the developer and should be based on support for
 each style in the intended runtime platform and the developer's preference.
 
@@ -446,7 +452,7 @@ async function runIt () {
 runIt()
 ```
 
-### Javascript Client-Side Frameworks Example
+### JavaScript Client-Side Frameworks Example
 
 Note: If you are using any client-side JavaScript framework (ex. Angular, React, etc) remember to import chainpoint-client in the following manner:
 
@@ -462,12 +468,7 @@ const chainpoint = require('chainpoint-client/dist/bundle.web')
 
 ### Browser Script Tag Example
 
-Note : You can copy `dist/bundle.web.js` into your app to be served from your own web server and included in a script tag, or use the [http://rawgit.com/](http://rawgit.com/) CDN (make sure the Git commit SHA1 in the URL is current). Rawgit is a free service and makes no guarantees for uptime.
-
-```html
-  <script src="https://cdn.rawgit.com/chainpoint/chainpoint-client-js/9db515aa5a4380181feb287bf4ed474ed86eb010/dist/bundle.web.js"></script>
-
-```
+You can copy `dist/bundle.web.js` into your app to be served from your own web server and included in a script tag.
 
 Or install the `npm` package in a place available to your web server pages and set the `script src` tag as shown in the example below. A set of window global functions (e.g. `chainpointClient.submitHashes()`) will then be available for use in a fashion similar to that shown in the examples above.
 
