@@ -488,11 +488,18 @@ function submitHashes(hashes, uris, callback) {
           return postOptions
         })
 
+        console.log('====================================')
+        console.log(nodesWithPostOpts, 'nodesWithPostOpts')
+        console.log('====================================')
+
         // All requests succeed in parallel or all fail.
         Promise.map(nodesWithPostOpts, rp, {
           concurrency: 25
         }).then(
           parsedBody => {
+            console.log('====================================')
+            console.log(parsedBody, 'parsedBody')
+            console.log('====================================')
             // Nodes cannot be guaranteed to know what IP address they are reachable
             // at, so we need to amend each result with the Node URI it was submitted
             // to so that proofs may later be retrieved from the appropriate Node(s).
