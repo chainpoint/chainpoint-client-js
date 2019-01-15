@@ -2,9 +2,8 @@ const path = require('path')
 const nodeExternals = require('webpack-node-externals')
 
 let base = {
-  entry: ['@babel/polyfill', './index.js'],
+  entry: ['@babel/polyfill', '@ungap/url-search-params', './index.js'],
   mode: 'production',
-  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -37,7 +36,8 @@ let web = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.web.js'
+    filename: 'bundle.web.js',
+    library: 'chainpointClient'
   }
 }
 

@@ -8,11 +8,8 @@
   "repository": "https://github.com/chainpoint/chainpoint-client-js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack": "webpack --profile --json > compilation-stats.json",
-    "analyze": "source-map-explorer dist/bundle.js dist/bundle.js.map",
-    "analyze-web": "source-map-explorer dist/bundle.web.js dist/bundle.web.js.map"
+    "webpack": "webpack"
   },
-  "sideEffects": false,
   "keywords": [],
   "devDependencies": {
     "@babel/core": "^7.2.2",
@@ -29,21 +26,16 @@
     "npm": "^6.5.0",
     "prettier": "^1.14.3",
     "terser-webpack-plugin": "^1.2.1",
-    "uglify-js": "^3.4.9",
-    "uglifyjs-webpack-plugin": "^2.1.1",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.1",
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
-    "bluebird": "^3.5.1",
+    "@ungap/url-search-params": "^0.1.2",
     "chainpoint-parse": "^3.1.4",
     "lodash": "^4.17.11",
-    "lodash-es": "^4.17.11",
-    "request": "^2.83.0",
-    "request-promise": "^4.2.2",
-    "source-map-explorer": "^1.6.0",
+    "node-fetch": "^2.3.0",
     "uuid": "^3.3.2",
     "uuid-validate": "^0.0.2",
     "validator": "^9.1.2"
