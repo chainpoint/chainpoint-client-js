@@ -88,7 +88,7 @@ function _isValidCoreURI(coreURI) {
  * @param {function} callback - An optional callback function.
  * @returns {string} - Returns either a callback or a Promise with an Array of Core URI strings.
  */
-function getCores(num, callback) {
+export function getCores(num, callback) {
   callback = callback || function() {}
   num = num || 1
 
@@ -181,7 +181,7 @@ function _isSecureOrigin() {
  * @param {function} callback - An optional callback function.
  * @returns {Array<String>} - Returns either a callback or a Promise with an Array of Node URI strings
  */
-function getNodes(num, callback) {
+export function getNodes(num, callback) {
   callback = callback || function() {}
   num = num || 3
 
@@ -412,7 +412,7 @@ function _flattenProofBranches(proofBranchArray) {
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
  * @return {Array<{uri: String, hash: String, hashIdNode: String, groupId: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
  */
-function submitHashes(hashes, uris, callback) {
+export function submitHashes(hashes, uris, callback) {
   uris = uris || []
   callback = callback || function() {}
   let nodesPromise
@@ -535,7 +535,7 @@ function submitHashes(hashes, uris, callback) {
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
  * @return {Array<{path: String, uri: String, hash: String, hashIdNode: String, groupId: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
  */
-function submitFileHashes(paths, uris, callback) {
+export function submitFileHashes(paths, uris, callback) {
   callback = callback || function() {}
   uris = uris || []
 
@@ -638,7 +638,7 @@ function sha256FileByPath(path) {
  * @param {function} callback - An optional callback function.
  * @return {Array<{uri: String, hashIdNode: String, proof: String}>} - An Array of Objects, each returning the URI the proof was returned from and the Proof in Base64 encoded binary form.
  */
-function getProofs(proofHandles, callback) {
+export function getProofs(proofHandles, callback) {
   callback = callback || function() {}
 
   // Validate callback is a function
@@ -772,7 +772,7 @@ function getProofs(proofHandles, callback) {
  * @param {function} callback - An optional callback function.
  * @return {Array<Object>} - An Array of Objects, one for each proof submitted, with vefification info.
  */
-function verifyProofs(proofs, uri, callback) {
+export function verifyProofs(proofs, uri, callback) {
   callback = callback || function() {}
 
   let evaluatedProofs = evaluateProofs(proofs)
@@ -928,7 +928,7 @@ function verifyProofs(proofs, uri, callback) {
  *
  * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be evaluated. Proofs can be in any of the supported JSON-LD or Binary formats.
  */
-function evaluateProofs(proofs) {
+export function evaluateProofs(proofs) {
   // Validate proofs arg
   if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
   if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
@@ -963,14 +963,4 @@ function evaluateProofs(proofs) {
   let flatProofs = _flattenProofs(parsedProofs)
 
   return flatProofs
-}
-
-module.exports = {
-  getCores: getCores,
-  getNodes: getNodes,
-  submitHashes: submitHashes,
-  submitFileHashes: submitFileHashes,
-  getProofs: getProofs,
-  verifyProofs: verifyProofs,
-  evaluateProofs: evaluateProofs
 }
