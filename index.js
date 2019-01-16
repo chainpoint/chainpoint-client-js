@@ -12,52 +12,79 @@
 
 'use strict'
 
-import {
-  isString as _isString,
-  isEmpty as _isEmpty,
-  isFunction as _isFunction,
-  isInteger as _isInteger,
-  map as _map,
-  shuffle as _shuffle,
-  filter as _filter,
-  slice as _slice,
-  first as _first,
-  isObject as _isObject,
-  has as _has,
-  isArray as _isArray,
-  forEach as _forEach,
-  isBuffer as _isBuffer,
-  reject as _reject,
-  uniq as _uniq,
-  every as _every,
-  keys as _keys,
-  flatten as _flatten,
-  mapKeys as _mapKeys,
-  camelCase as _camelCase,
-  uniqWith as _uniqWith,
-  isEqual as _isEqual,
-  curry as _curry
-} from 'lodash'
-const Promise = require('bluebird')
+import _isString from 'lodash/isString'
+import _isEmpty from 'lodash/isEmpty'
+import _isFunction from 'lodash/isFunction'
+import _isInteger from 'lodash/isInteger'
+import _map from 'lodash/map'
+import _shuffle from 'lodash/shuffle'
+import _filter from 'lodash/filter'
+import _slice from 'lodash/slice'
+import _first from 'lodash/first'
+import _isObject from 'lodash/isObject'
+import _has from 'lodash/has'
+import _isArray from 'lodash/isArray'
+import _forEach from 'lodash/forEach'
+import _isBuffer from 'lodash/isBuffer'
+import _reject from 'lodash/reject'
+import _uniq from 'lodash/uniq'
+import _every from 'lodash/every'
+import _keys from 'lodash/keys'
+import _flatten from 'lodash/flatten'
+import _mapKeys from 'lodash/mapKeys'
+import _camelCase from 'lodash/camelCase'
+import _uniqWith from 'lodash/uniqWith'
+import _isEqual from 'lodash/isEqual'
+
+import isURL from 'validator/lib/isURL'
+import isIP from 'validator/lib/isIP'
+import isJSON from 'validator/lib/isJSON'
+import isBase64 from 'validator/lib/isBase64'
+
 const dns = require('dns')
 const url = require('url')
-const validator = require('validator')
 const uuidValidate = require('uuid-validate')
 const cpp = require('chainpoint-parse')
-const request = require('request')
-const rp = require('request-promise')
 const crypto = require('crypto')
 const fs = require('fs')
 const uuidv1 = require('uuid/v1')
+const fetch = require('node-fetch')
 
 const NODE_PROXY_URI = 'https://node-proxy.chainpoint.org:443'
 
-Promise.config({
-  // Enables all warnings except forgotten return statements.
-  warnings: {
-    wForgottenReturn: false
-  }
-})
+const promiseMap = (arr, fn) => {
+  return Promise.all(
+    arr.map(currVal => {
+      let obj = JSON.parse(JSON.stringify(currVal))
+      let method = obj.method
+      let uri = obj.uri
+      let body = obj.body
+
+      delete obj.method
+      delete obj.uri
+      delete obj.body
+
+      switch (method) {
+        case 'GET':
+          return fn(uri, obj).then(res => {
+            let res1 = res.clone()
+
+            return res.json().catch(() => res1.text())
+          })
+        case 'POST':
+          return fn(uri, {
+            method,
+            ...obj,
+            body: JSON.stringify(body)
+          }).then(res => {
+            let res1 = res.clone()
+
+            return res.json().catch(() => res1.text())
+          })
+      }
+    })
+  )
+}
 
 const DNS_CORE_DISCOVERY_ADDR = '_core.addr.chainpoint.org'
 
@@ -71,7 +98,7 @@ function _isValidCoreURI(coreURI) {
   if (_isEmpty(coreURI) || !_isString(coreURI)) return false
 
   try {
-    return validator.isURL(coreURI, {
+    return isURL(coreURI, {
       protocols: ['https'],
       require_protocol: true,
       host_whitelist: [/^[a-z]\.chainpoint\.org$/]
@@ -88,7 +115,7 @@ function _isValidCoreURI(coreURI) {
  * @param {function} callback - An optional callback function.
  * @returns {string} - Returns either a callback or a Promise with an Array of Core URI strings.
  */
-function getCores(num, callback) {
+export function getCores(num, callback) {
   callback = callback || function() {}
   num = num || 1
 
@@ -150,7 +177,7 @@ function _isValidNodeURI(nodeURI) {
   if (!_isString(nodeURI)) return false
 
   try {
-    let isValidURI = validator.isURL(nodeURI, {
+    let isValidURI = isURL(nodeURI, {
       protocols: ['http', 'https'],
       require_protocol: true,
       host_blacklist: ['0.0.0.0']
@@ -159,7 +186,7 @@ function _isValidNodeURI(nodeURI) {
     let parsedURI = url.parse(nodeURI).hostname
 
     // Valid URI w/ IPv4 address?
-    return isValidURI && validator.isIP(parsedURI, 4)
+    return isValidURI && isIP(parsedURI, 4)
   } catch (error) {
     return false
   }
@@ -181,7 +208,7 @@ function _isSecureOrigin() {
  * @param {function} callback - An optional callback function.
  * @returns {Array<String>} - Returns either a callback or a Promise with an Array of Node URI strings
  */
-function getNodes(num, callback) {
+export function getNodes(num, callback) {
   callback = callback || function() {}
   num = num || 3
 
@@ -192,20 +219,11 @@ function getNodes(num, callback) {
     getCores(1)
       .then(coreURI => {
         let getNodeURI = _first(coreURI) + '/nodes/random'
-        request(
-          {
-            uri: getNodeURI,
-            json: true,
-            timeout: 10000
-          },
-          (err, response, body) => {
-            if (err) {
-              reject(err)
-              return callback(err)
-            }
-
+        return fetch(getNodeURI)
+          .then(res => res.json())
+          .then(response => {
             // extract public_uri from each node object
-            let nodes = _map(body, 'public_uri')
+            let nodes = _map(response, 'public_uri')
             // randomize the order
             let shuffledNodes = _shuffle(nodes)
             // only return nodes with valid addresses (should be all)
@@ -222,8 +240,7 @@ function getNodes(num, callback) {
 
             resolve(slicedNodes)
             return callback(null, slicedNodes)
-          }
-        )
+          })
       })
       .catch(err => {
         reject(err)
@@ -324,10 +341,10 @@ function _parseProofs(proofs) {
     if (_isObject(proof)) {
       // OBJECT
       parsedProofs.push(cpp.parse(proof))
-    } else if (validator.isJSON(proof)) {
+    } else if (isJSON(proof)) {
       // JSON-LD
       parsedProofs.push(cpp.parse(JSON.parse(proof)))
-    } else if (validator.isBase64(proof) || _isBuffer(proof) || _isHex(proof)) {
+    } else if (isBase64(proof) || _isBuffer(proof) || _isHex(proof)) {
       // BINARY
       parsedProofs.push(cpp.parse(proof))
     } else {
@@ -412,7 +429,7 @@ function _flattenProofBranches(proofBranchArray) {
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
  * @return {Array<{uri: String, hash: String, hashIdNode: String, groupId: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
  */
-function submitHashes(hashes, uris, callback) {
+export function submitHashes(hashes, uris, callback) {
   uris = uris || []
   callback = callback || function() {}
   let nodesPromise
@@ -466,7 +483,8 @@ function submitHashes(hashes, uris, callback) {
           let uri = _isSecureOrigin() ? NODE_PROXY_URI : node
           let headers = Object.assign(
             {
-              'content-type': 'application/json'
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
             },
             _isSecureOrigin()
               ? {
@@ -482,21 +500,20 @@ function submitHashes(hashes, uris, callback) {
               hashes: hashes
             },
             headers,
-            timeout: 10000,
-            json: true
+            timeout: 10000
           }
           return postOptions
         })
 
         // All requests succeed in parallel or all fail.
-        Promise.map(nodesWithPostOpts, rp, {
+        promiseMap(nodesWithPostOpts, fetch, {
           concurrency: 25
         }).then(
           parsedBody => {
             // Nodes cannot be guaranteed to know what IP address they are reachable
             // at, so we need to amend each result with the Node URI it was submitted
             // to so that proofs may later be retrieved from the appropriate Node(s).
-            // This mapping relies on that fact that Promise.map returns results in the
+            // This mapping relies on that fact that promiseMap returns results in the
             // same order that options were passed to it so the results can be mapped to
             // the Nodes submitted to.
             _forEach(nodes, (uri, index) => {
@@ -528,7 +545,7 @@ function submitHashes(hashes, uris, callback) {
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
  * @return {Array<{path: String, uri: String, hash: String, hashIdNode: String, groupId: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
  */
-function submitFileHashes(paths, uris, callback) {
+export function submitFileHashes(paths, uris, callback) {
   callback = callback || function() {}
   uris = uris || []
 
@@ -631,7 +648,7 @@ function sha256FileByPath(path) {
  * @param {function} callback - An optional callback function.
  * @return {Array<{uri: String, hashIdNode: String, proof: String}>} - An Array of Objects, each returning the URI the proof was returned from and the Proof in Base64 encoded binary form.
  */
-function getProofs(proofHandles, callback) {
+export function getProofs(proofHandles, callback) {
   callback = callback || function() {}
 
   // Validate callback is a function
@@ -697,6 +714,7 @@ function getProofs(proofHandles, callback) {
       let nodesWithGetOpts = _map(_keys(uuidsByNode), node => {
         let headers = Object.assign(
           {
+            accept: 'application/json',
             'content-type': 'application/json'
           },
           {
@@ -713,18 +731,17 @@ function getProofs(proofHandles, callback) {
           uri: (_isSecureOrigin() ? NODE_PROXY_URI : node) + '/proofs',
           body: {},
           headers,
-          timeout: 10000,
-          json: true
+          timeout: 10000
         }
         return getOptions
       })
 
       // Perform parallel GET requests to all Nodes with proofs
-      Promise.map(nodesWithGetOpts, rp, {
+      promiseMap(nodesWithGetOpts, fetch, {
         concurrency: 25
       }).then(
         function(parsedBody) {
-          // Promise.map returns an Array entry for each host it submits to.
+          // promiseMap returns an Array entry for each host it submits to.
           let flatParsedBody = _flatten(parsedBody)
 
           let proofsResponse = []
@@ -765,7 +782,7 @@ function getProofs(proofHandles, callback) {
  * @param {function} callback - An optional callback function.
  * @return {Array<Object>} - An Array of Objects, one for each proof submitted, with vefification info.
  */
-function verifyProofs(proofs, uri, callback) {
+export function verifyProofs(proofs, uri, callback) {
   callback = callback || function() {}
 
   let evaluatedProofs = evaluateProofs(proofs)
@@ -815,7 +832,8 @@ function verifyProofs(proofs, uri, callback) {
           let nodesWithGetOpts = _map(uniqAnchorURIs, anchorURI => {
             let headers = Object.assign(
               {
-                'content-type': 'application/json'
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
               },
               _isSecureOrigin()
                 ? {
@@ -833,11 +851,10 @@ function verifyProofs(proofs, uri, callback) {
 
             return {
               method: 'GET',
-              uri,
+              uri: uri,
               body: {},
               headers,
-              timeout: 10000,
-              json: true
+              timeout: 10000
             }
           })
 
@@ -845,11 +862,11 @@ function verifyProofs(proofs, uri, callback) {
         })
         .then(([flatProofs, nodesWithGetOpts]) => {
           // Perform parallel GET requests to all Nodes with proofs
-          let hashesByNodeURI = Promise.map(nodesWithGetOpts, rp, {
+          let hashesByNodeURI = promiseMap(nodesWithGetOpts, fetch, {
             concurrency: 25
           })
             .then(parsedBody => {
-              // Promise.map returns an Array entry for each host it submits to.
+              // promiseMap returns an Array entry for each host it submits to.
               let flatParsedBody = _flatten(parsedBody)
 
               let r = {}
@@ -921,7 +938,7 @@ function verifyProofs(proofs, uri, callback) {
  *
  * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be evaluated. Proofs can be in any of the supported JSON-LD or Binary formats.
  */
-function evaluateProofs(proofs) {
+export function evaluateProofs(proofs) {
   // Validate proofs arg
   if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
   if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
@@ -939,10 +956,7 @@ function evaluateProofs(proofs) {
     ) {
       // Probably a JS Object Proof
       return proof
-    } else if (
-      _isString(proof) &&
-      (validator.isJSON(proof) || validator.isBase64(proof))
-    ) {
+    } else if (_isString(proof) && (isJSON(proof) || isBase64(proof))) {
       // Probably a JSON String or Base64 encoded binary proof
       return proof
     } else {
@@ -956,14 +970,4 @@ function evaluateProofs(proofs) {
   let flatProofs = _flattenProofs(parsedProofs)
 
   return flatProofs
-}
-
-module.exports = {
-  getCores: getCores,
-  getNodes: getNodes,
-  submitHashes: submitHashes,
-  submitFileHashes: submitFileHashes,
-  getProofs: getProofs,
-  verifyProofs: verifyProofs,
-  evaluateProofs: evaluateProofs
 }

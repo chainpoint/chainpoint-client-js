@@ -1,34 +1,31 @@
 const path = require('path')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const nodeExternals = require('webpack-node-externals')
 
 let base = {
-  entry: './index.js',
+  entry: ['@babel/polyfill', '@ungap/url-search-params', './index.js'],
+  mode: 'production',
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          presets: [
-            ['env', {
-              targets: {
-                node: true,
-                'browsers': ['last 2 versions', 'safari >= 7']
-              },
-              // for uglifyjs...
-              forceAllTransforms: true
-            }]
-          ]
+        test: /\.m?js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: [
+              '@babel/plugin-proposal-object-rest-spread',
+              '@babel/plugin-transform-regenerator'
+            ]
+          }
         }
       }
     ]
-  },
-  plugins: [
-    new UglifyJSPlugin()
-  ]
+  }
 }
 
 let web = {
+  entry: './index.js',
   target: 'web',
   node: {
     dgram: 'empty',
@@ -40,39 +37,19 @@ let web = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.web.js',
-    library: 'chainpointClient',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    library: 'chainpointClient'
   }
 }
 
 let node = {
   target: 'node',
+  externals: [nodeExternals()],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
     library: 'chainpointClient',
     libraryTarget: 'umd',
     umdNamedDefine: true
-  },
-  module: {
-    loaders: [
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          presets: [
-            ['env', {
-              targets: {
-                node: true
-              },
-              // for uglifyjs...
-              forceAllTransforms: true
-            }]
-          ]
-        }
-      }
-    ]
   }
 }
 
