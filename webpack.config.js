@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const nodeExternals = require('webpack-node-externals')
 
 let base = {
@@ -37,8 +38,15 @@ let web = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.web.js',
-    library: 'chainpointClient'
-  }
+    library: 'chainpointClient',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      chainpointClient: 'chainpointClient'
+    })
+  ]
 }
 
 let node = {
