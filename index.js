@@ -971,3 +971,13 @@ export function evaluateProofs(proofs) {
 
   return flatProofs
 }
+
+export default {
+  getCores,
+  getNodes,
+  submitHashes,
+  submitFileHashes,
+  getProofs,
+  verifyProofs,
+  evaluateProofs
+}
