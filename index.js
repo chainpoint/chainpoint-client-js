@@ -1015,11 +1015,12 @@ function _flattenBtcBranches(proofs) {
             element => element.label === 'btc_anchor_branch'
           )
           btcAnchor.raw_btc_tx = btcBranch.rawTx
-          // get the expected anchor value (i.e. the merkle root of
-          // target block)
-          btcAnchor.expected_value = btcBranch.anchors.find(
-            anchor => anchor.type === 'btc'
-          ).expected_value
+          // get the btc anchor
+          let anchor = btcBranch.anchors.find(anchor => anchor.type === 'btc')
+          // add expected_value (i.e. the merkle root of anchored block)
+          btcAnchor.expected_value = anchor.expected_value
+          // add anchor_id (i.e. the anchored block height)
+          btcAnchor.anchor_id = anchor.anchor_id
         }
       })
     }
