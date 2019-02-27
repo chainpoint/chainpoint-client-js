@@ -1009,10 +1009,18 @@ function _flattenBtcBranches(proofs) {
       _forEach(proof.branches, branch => {
         // sub branches indicate other anchors
         // we want to find the sub-branch that anchors to btc
-        if (branch.branches)
-          btcAnchor.raw_btc_tx = branch.branches.find(
+        if (branch.branches) {
+          // get the raw tx from the btc_anchor_branch
+          let btcBranch = branch.branches.find(
             element => element.label === 'btc_anchor_branch'
-          ).rawTx
+          )
+          btcAnchor.raw_btc_tx = btcBranch.rawTx
+          // get the expected anchor value (i.e. the merkle root of
+          // target block)
+          btcAnchor.expected_value = btcBranch.anchors.find(
+            anchor => anchor.type === 'btc'
+          ).expected_value
+        }
       })
     }
 
