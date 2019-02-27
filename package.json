@@ -33,7 +33,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "@ungap/url-search-params": "^0.1.2",
-    "chainpoint-parse": "^3.1.4",
+    "chainpoint-parse": "^3.2.0",
     "lodash": "^4.17.11",
     "node-fetch": "^2.3.0",
     "uuid": "^3.3.2",
