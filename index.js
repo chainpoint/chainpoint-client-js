@@ -1038,5 +1038,6 @@ export default {
   submitFileHashes,
   getProofs,
   verifyProofs,
-  evaluateProofs
+  evaluateProofs,
+  getProofTxs
 }
