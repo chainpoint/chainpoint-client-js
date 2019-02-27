@@ -424,7 +424,45 @@ function _flattenProofBranches(proofBranchArray) {
 }
 
 /**
- * validate proofs and get normalized for actions such as parsing
+ * Get raw btc transactions for each hash_id_node
+ * @param {Array} proofs - array of previously parsed proofs
+ * @return {Obect[]} - an array of objects with hash_id_node and raw btc tx
+ */
+function _flattenBtcBranches(proofs) {
+  let flattenedBranches = []
+
+  _forEach(proofs, proof => {
+    let btcAnchor = {}
+    btcAnchor.hash_id_node = proof.hash_id_node
+
+    if (proof.branches) {
+      _forEach(proof.branches, branch => {
+        // sub branches indicate other anchors
+        // we want to find the sub-branch that anchors to btc
+        if (branch.branches) {
+          // get the raw tx from the btc_anchor_branch
+          let btcBranch = branch.branches.find(
+            element => element.label === 'btc_anchor_branch'
+          )
+          btcAnchor.raw_btc_tx = btcBranch.rawTx
+          // get the btc anchor
+          let anchor = btcBranch.anchors.find(anchor => anchor.type === 'btc')
+          // add expected_value (i.e. the merkle root of anchored block)
+          btcAnchor.expected_value = anchor.expected_value
+          // add anchor_id (i.e. the anchored block height)
+          btcAnchor.anchor_id = anchor.anchor_id
+        }
+      })
+    }
+
+    flattenedBranches.push(btcAnchor)
+  })
+
+  return flattenedBranches
+}
+
+/**
+ * validate and normalize proofs for actions such as parsing
  * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be verified. Proofs can be in any of the supported JSON-LD or Binary formats.
  @return {Array<Object>} - An Array of Objects, one for each proof submitted.
  */
@@ -991,44 +1029,6 @@ export function getProofTxs(proofs) {
   let parsedProofs = _parseProofs(normalizedProofs)
   let flatProofs = _flattenBtcBranches(parsedProofs)
   return flatProofs
-}
-
-/**
- * Get raw btc transactions for each hash_id_node
- * @param {Array} proofs - array of previously parsed proofs
- * @return {Obect[]} - an array of objects with hash_id_node and raw btc tx
- */
-function _flattenBtcBranches(proofs) {
-  let flattenedBranches = []
-
-  _forEach(proofs, proof => {
-    let btcAnchor = {}
-    btcAnchor.hash_id_node = proof.hash_id_node
-
-    if (proof.branches) {
-      _forEach(proof.branches, branch => {
-        // sub branches indicate other anchors
-        // we want to find the sub-branch that anchors to btc
-        if (branch.branches) {
-          // get the raw tx from the btc_anchor_branch
-          let btcBranch = branch.branches.find(
-            element => element.label === 'btc_anchor_branch'
-          )
-          btcAnchor.raw_btc_tx = btcBranch.rawTx
-          // get the btc anchor
-          let anchor = btcBranch.anchors.find(anchor => anchor.type === 'btc')
-          // add expected_value (i.e. the merkle root of anchored block)
-          btcAnchor.expected_value = anchor.expected_value
-          // add anchor_id (i.e. the anchored block height)
-          btcAnchor.anchor_id = anchor.anchor_id
-        }
-      })
-    }
-
-    flattenedBranches.push(btcAnchor)
-  })
-
-  return flattenedBranches
 }
 
 export default {
