@@ -424,6 +424,78 @@ function _flattenProofBranches(proofBranchArray) {
 }
 
 /**
+ * Get raw btc transactions for each hash_id_node
+ * @param {Array} proofs - array of previously parsed proofs
+ * @return {Obect[]} - an array of objects with hash_id_node and raw btc tx
+ */
+function _flattenBtcBranches(proofs) {
+  let flattenedBranches = []
+
+  _forEach(proofs, proof => {
+    let btcAnchor = {}
+    btcAnchor.hash_id_node = proof.hash_id_node
+
+    if (proof.branches) {
+      _forEach(proof.branches, branch => {
+        // sub branches indicate other anchors
+        // we want to find the sub-branch that anchors to btc
+        if (branch.branches) {
+          // get the raw tx from the btc_anchor_branch
+          let btcBranch = branch.branches.find(
+            element => element.label === 'btc_anchor_branch'
+          )
+          btcAnchor.raw_btc_tx = btcBranch.rawTx
+          // get the btc anchor
+          let anchor = btcBranch.anchors.find(anchor => anchor.type === 'btc')
+          // add expected_value (i.e. the merkle root of anchored block)
+          btcAnchor.expected_value = anchor.expected_value
+          // add anchor_id (i.e. the anchored block height)
+          btcAnchor.anchor_id = anchor.anchor_id
+        }
+      })
+    }
+
+    flattenedBranches.push(btcAnchor)
+  })
+
+  return flattenedBranches
+}
+
+/**
+ * validate and normalize proofs for actions such as parsing
+ * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be verified. Proofs can be in any of the supported JSON-LD or Binary formats.
+ @return {Array<Object>} - An Array of Objects, one for each proof submitted.
+ */
+function _normalizeProofs(proofs) {
+  // Validate proofs arg
+  if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
+  if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
+
+  // If any entry in the proofs Array is an Object, process
+  // it assuming the same form as the output of getProofs().
+  return _map(proofs, proof => {
+    if (_isObject(proof) && _has(proof, 'proof') && _isString(proof.proof)) {
+      // Probably result of `submitProofs()` call. Extract proof String
+      return proof.proof
+    } else if (
+      _isObject(proof) &&
+      _has(proof, 'type') &&
+      proof.type === 'Chainpoint'
+    ) {
+      // Probably a JS Object Proof
+      return proof
+    } else if (_isString(proof) && (isJSON(proof) || isBase64(proof))) {
+      // Probably a JSON String or Base64 encoded binary proof
+      return proof
+    } else {
+      throw new Error(
+        'proofs arg Array has elements that are not Objects or Strings'
+      )
+    }
+  })
+}
+
+/**
  * Submit hash(es) to one or more Nodes, returning an Array of proof handle objects, one for each submitted hash and Node combination.
  * @param {Array<String>} hashes - An Array of String Hashes in Hexadecimal form.
  * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
@@ -939,36 +1011,23 @@ export function verifyProofs(proofs, uri, callback) {
  * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be evaluated. Proofs can be in any of the supported JSON-LD or Binary formats.
  */
 export function evaluateProofs(proofs) {
-  // Validate proofs arg
-  if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
-  if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
-
-  // If any entry in the proofs Array is an Object, process
-  // it assuming the same form as the output of getProofs().
-  let normalizedProofs = _map(proofs, proof => {
-    if (_isObject(proof) && _has(proof, 'proof') && _isString(proof.proof)) {
-      // Probably result of `submitProofs()` call. Extract proof String
-      return proof.proof
-    } else if (
-      _isObject(proof) &&
-      _has(proof, 'type') &&
-      proof.type === 'Chainpoint'
-    ) {
-      // Probably a JS Object Proof
-      return proof
-    } else if (_isString(proof) && (isJSON(proof) || isBase64(proof))) {
-      // Probably a JSON String or Base64 encoded binary proof
-      return proof
-    } else {
-      throw new Error(
-        'proofs arg Array has elements that are not Objects or Strings'
-      )
-    }
-  })
-
+  let normalizedProofs = _normalizeProofs(proofs)
   let parsedProofs = _parseProofs(normalizedProofs)
   let flatProofs = _flattenProofs(parsedProofs)
 
+  return flatProofs
+}
+
+/**
+ * retrieve raw btc tx objects for corresponding proofs
+ * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be evaluated. Proofs can be in any of the supported JSON-LD or Binary formats.
+ * @returns {Object[]} - array of objects with relevant hash data
+ */
+
+export function getProofTxs(proofs) {
+  let normalizedProofs = _normalizeProofs(proofs)
+  let parsedProofs = _parseProofs(normalizedProofs)
+  let flatProofs = _flattenBtcBranches(parsedProofs)
   return flatProofs
 }
 
