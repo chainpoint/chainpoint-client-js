@@ -49,6 +49,11 @@ const crypto = require('crypto')
 const fs = require('fs')
 const uuidv1 = require('uuid/v1')
 const fetch = require('node-fetch')
+const Config = require('bcfg')
+const { NodeClient } = require('bclient')
+const { protocol } = require('bcoin')
+
+const { Network } = protocol
 
 const NODE_PROXY_URI = 'https://node-proxy.chainpoint.org:443'
 
@@ -847,12 +852,64 @@ export function getProofs(proofHandles, callback) {
 }
 
 /**
+ * Verify a collection of bitcoin proofs using bcoin node
+ *
+ * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be verified. Proofs can be in any of the supported JSON-LD or Binary formats.
+ * @return {Array<Object>} - An Array of proof objects, one for each proof submitted with verification info.
+ */
+export async function spvVerifyProofs(proofs) {
+  let evaluatedProofs = evaluateProofs(proofs)
+
+  // create a config object to read bcoin client options
+  let config = new Config('chainpoint')
+  config.load({
+    file: true,
+    argv: true,
+    env: true
+  })
+
+  config.open('bcoin.conf')
+  let network = Network.get(config.str('network', Network.primary))
+  let client = new NodeClient({
+    network: network.type,
+    port: config.int('port', network.rpcPort),
+    host: config.str('host', '127.0.0.1'),
+    apiKey: config.str('api-key'),
+    ssl: config.bool('ssl', false),
+    protocol: config.str('protocol', 'http')
+  })
+
+  let results = evaluatedProofs
+    .filter(proof => proof.type === 'btc' && proof.anchor_id)
+    .map(async proof => {
+      try {
+        let hash = await client.execute('getblockhash', [
+          parseInt(proof.anchor_id, 10)
+        ])
+        let header = await client.execute('getblockheader', [hash])
+        let verified = header.merkleroot === proof.expected_value
+
+        let verifiedProof = { ...proof, verified }
+        verifiedProof.verified_at = verified
+          ? new Date().toISOString().slice(0, 19) + 'Z'
+          : null
+        return _mapKeys(verifiedProof, (v, k) => _camelCase(k))
+      } catch (err) {
+        throw new Error(
+          `Problem validating proof with spv node: ${err.message}`
+        )
+      }
+    })
+  return Promise.all(results)
+}
+
+/**
  * Verify a collection of proofs using an optionally provided Node URI
  *
  * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be verified. Proofs can be in any of the supported JSON-LD or Binary formats.
  * @param {String} uri - [Optional] The Node URI to submit proof(s) to for verification. If not provided a Node will be selected at random. All proofs will be verified by a single Node.
  * @param {function} callback - An optional callback function.
- * @return {Array<Object>} - An Array of Objects, one for each proof submitted, with vefification info.
+ * @return {Array<Object>} - An Array of Objects, one for each proof submitted, with verification info.
  */
 export function verifyProofs(proofs, uri, callback) {
   callback = callback || function() {}

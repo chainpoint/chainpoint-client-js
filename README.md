@@ -292,6 +292,27 @@ Example Return Value
 ]
 ```
 
+### `spvVerifyProofs (proofs)`
+
+#### Description
+Same as `verifyProofs` above except it will verify btc anchor proofs (and only btc proofs)
+against a bitcoin node. Since only the block headers are required to verify
+a proof, an spv node is sufficient to verify. Only the [bcoin](https://bcoin.io)
+API is currently supported, though this could be expanded in the future.
+
+To make your target node's information available to the verification client, add a `bcoin.conf`
+file in your `~/.chainpoint` directory with all relevant information (`host`, `port`, `api-key`, etc)
+See [here](http://bcoin.io/api-docs/index.html#configuring-clients) for more information.
+Environment variables (prefaced with `BCOIN_`) and command line args (prefaced with `--bcoin-`)
+are also supported configuration options.
+
+#### Arguments
+
+The `proofs` argument accepts an Array of Strings or Objects.
+
+#### Return Values
+The return values are the same as with `verifyProofs` above
+
 ### `evaluateProofs (proofs)`
 
 #### Description
