@@ -874,7 +874,9 @@ export async function spvVerifyProofs(proofs) {
     network: network.type,
     port: config.int('port', network.rpcPort),
     host: config.str('host', '127.0.0.1'),
-    apiKey: config.str('api-key')
+    apiKey: config.str('api-key'),
+    ssl: config.bool('ssl', false),
+    protocol: config.str('protocol', 'http')
   })
 
   let results = evaluatedProofs
