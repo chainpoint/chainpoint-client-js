@@ -8,9 +8,5 @@
   // Enable/disable JavaScript validation.
   "javascript.validate.enable": false,
   // Enable/disable default JavaScript formatter.
-  "javascript.format.enable": false,
-  // Control whether or not jslint is enabled for JavaScript files.
-  "jslint.enable": false,
-  // Controls whether JavaScript Standard Style is enabled for JavaScript files or not.
-  "standard.enable": false
+  "javascript.format.enable": false
 }
