@@ -8,8 +8,10 @@
   "repository": "https://github.com/chainpoint/chainpoint-client-js",
   "scripts": {
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
+    "lint": "eslint *.js lib/*.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "prepublish": "webpack"
   },
   "husky": {
     "hooks": {
