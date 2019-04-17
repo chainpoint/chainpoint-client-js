@@ -3,6 +3,7 @@
 [![npm](https://img.shields.io/npm/l/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
 [![npm](https://img.shields.io/npm/v/chainpoint-client.svg)](https://www.npmjs.com/package/chainpoint-client)
 [![Build Status](https://travis-ci.com/chainpoint/chainpoint-client-js.svg?branch=master)](https://travis-ci.com/chainpoint/chainpoint-client-js)
+[![Coverage Status](https://coveralls.io/repos/github/chainpoint/chainpoint-client-js/badge.svg?branch=master)](https://coveralls.io/github/chainpoint/chainpoint-client-js?branch=master)
 
 ## About
 

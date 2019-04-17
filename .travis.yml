@@ -4,6 +4,7 @@ node_js:
 cache:
   directories:
     - node_modules
+before_script: yarn run webpack
 script:
   - yarn run lint
   - yarn test
