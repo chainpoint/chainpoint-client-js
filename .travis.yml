@@ -6,6 +6,8 @@ cache:
     - node_modules
 before_script: yarn run webpack
 script:
-  - yarn run lint
-  - yarn test
+  - yarn run $TEST_SUITE
 after_success: yarn run coverage
+env:
+  - TEST_SUITE=test
+  - TEST_SUITE=lint
