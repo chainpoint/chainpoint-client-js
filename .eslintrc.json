@@ -9,6 +9,12 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
+  "overrides": {
+    "files": ["tests/**/*-test.js"],
+    "env": {
+      "mocha": true
+    }
+  },
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",

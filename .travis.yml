@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+  - '10'
+cache:
+  directories:
+    - node_modules
+before_script: yarn run webpack
+script:
+  - yarn run $TEST_TYPE
+after_success: yarn run coverage
+matrix:
+  include:
+    - name: 'style tests'
+      env: TEST_TYPE=lint
+    - name: 'unit tests'
+      env: TEST_TYPE=test
