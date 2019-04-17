@@ -20,11 +20,8 @@ import _shuffle from 'lodash/shuffle'
 import _filter from 'lodash/filter'
 import _slice from 'lodash/slice'
 import _first from 'lodash/first'
-import _isObject from 'lodash/isObject'
-import _has from 'lodash/has'
 import _isArray from 'lodash/isArray'
 import _forEach from 'lodash/forEach'
-import _isBuffer from 'lodash/isBuffer'
 import _reject from 'lodash/reject'
 import _uniq from 'lodash/uniq'
 import _every from 'lodash/every'
@@ -35,19 +32,27 @@ import _camelCase from 'lodash/camelCase'
 import _uniqWith from 'lodash/uniqWith'
 import _isEqual from 'lodash/isEqual'
 
-import isURL from 'validator/lib/isURL'
-import isIP from 'validator/lib/isIP'
-import isJSON from 'validator/lib/isJSON'
-import isBase64 from 'validator/lib/isBase64'
-
 const dns = require('dns')
 const url = require('url')
-const uuidValidate = require('uuid-validate')
-const cpp = require('chainpoint-parse')
 const crypto = require('crypto')
 const fs = require('fs')
-const uuidv1 = require('uuid/v1')
 const fetch = require('node-fetch')
+
+import utils from './lib/utils'
+
+const {
+  isHex,
+  isSecureOrigin,
+  isValidCoreURI,
+  isValidNodeURI,
+  isValidProofHandle,
+  isValidUUID,
+  flattenBtcBranches,
+  flattenProofs,
+  mapSubmitHashesRespToProofHandles,
+  normalizeProofs,
+  parseProofs
+} = utils
 
 const NODE_PROXY_URI = 'https://node-proxy.chainpoint.org:443'
 
@@ -88,26 +93,6 @@ const promiseMap = (arr, fn) => {
 const DNS_CORE_DISCOVERY_ADDR = '_core.addr.chainpoint.org'
 
 /**
- * Check if valid Core URI
- *
- * @param {string} coreURI - The Core URI to test for validity
- * @returns {bool} true if coreURI is a valid Core URI, otherwise false
- */
-function _isValidCoreURI(coreURI) {
-  if (_isEmpty(coreURI) || !_isString(coreURI)) return false
-
-  try {
-    return isURL(coreURI, {
-      protocols: ['https'],
-      require_protocol: true,
-      host_whitelist: [/^[a-z]\.chainpoint\.org$/]
-    })
-  } catch (error) {
-    return false
-  }
-}
-
-/**
  * Retrieve an Array of discovered Core URIs. Returns one Core URI by default.
  *
  * @param {Integer} num - Max number of Core URI's to return.
@@ -142,7 +127,7 @@ export function getCores(num, callback) {
         let shuffledCores = _shuffle(cores)
         // only return cores with valid addresses (should be all)
         let filteredCores = _filter(shuffledCores, function(c) {
-          return _isValidCoreURI(c)
+          return isValidCoreURI(c)
         })
         // only return num cores
         let slicedCores = _slice(filteredCores, 0, num)
@@ -159,39 +144,6 @@ export function getCores(num, callback) {
       return callback(null, slicedCores)
     }
   })
-}
-
-/**
- * Check if valid Node URI
- *
- * @param {string} nodeURI - The value to check
- * @returns {bool} true if value is a valid Node URI, otherwise false
- */
-function _isValidNodeURI(nodeURI) {
-  if (!_isString(nodeURI)) return false
-
-  try {
-    let isValidURI = isURL(nodeURI, {
-      protocols: ['http', 'https'],
-      require_protocol: true,
-      host_blacklist: ['0.0.0.0']
-    })
-
-    let parsedURI = url.parse(nodeURI).hostname
-
-    // Valid URI w/ IPv4 address?
-    return isValidURI && isIP(parsedURI, 4)
-  } catch (error) {
-    return false
-  }
-}
-
-/**
- * Check if client is being used over an https connection
- * @returns {bool} true if served over https
- */
-function _isSecureOrigin() {
-  return typeof window === 'object' && window.location.protocol === 'https:'
 }
 
 /**
@@ -221,7 +173,7 @@ export function getNodes(num, callback) {
             let shuffledNodes = _shuffle(nodes)
             // only return nodes with valid addresses (should be all)
             let filteredNodes = _filter(shuffledNodes, function(n) {
-              return _isValidNodeURI(n)
+              return isValidNodeURI(n)
             })
             // only return maxNodes nodes
             let slicedNodes = _slice(filteredNodes, 0, num)
@@ -237,233 +189,6 @@ export function getNodes(num, callback) {
         reject(err)
         return callback(err)
       })
-  })
-}
-
-/**
- * Checks if value is a hexadecimal string
- *
- * @param {string} value - The value to check
- * @returns {bool} true if value is a hexadecimal string, otherwise false
- */
-function _isHex(value) {
-  var hexRegex = /^[0-9a-f]{2,}$/i
-  var isHex = hexRegex.test(value) && !(value.length % 2)
-  return isHex
-}
-
-/**
- * Checks if a proof handle Object has valid params.
- *
- * @param {Object} handle - The proof handle to check
- * @returns {bool} true if handle is valid Object with expected params, otherwise false
- */
-function _isValidProofHandle(handle) {
-  if (!_isEmpty(handle) && _isObject(handle) && _has(handle, 'uri') && _has(handle, 'hashIdNode')) {
-    return true
-  }
-}
-
-/**
- * Checks if a UUID is a valid v1 UUID.
- *
- * @param {string} uuid - The uuid to check
- * @returns {bool} true if uuid is valid, otherwise false
- */
-function _isValidUUID(uuid) {
-  if (uuidValidate(uuid, 1)) {
-    return true
-  }
-}
-
-/**
- * Map the JSON API response from submitting a hash to a Node to a
- * more accessible form that can also be used as the input arg to
- * getProofs function.
- *
- * @param {Array} respArray - An Array of responses, one for each Node submitted to
- * @returns {Array<{uri: String, hash: String, hashIdNode: String}>} An Array of proofHandles
- */
-function _mapSubmitHashesRespToProofHandles(respArray) {
-  if (!_isArray(respArray) && !respArray.length)
-    throw new Error('_mapSubmitHashesRespToProofHandles arg must be an Array')
-
-  let proofHandles = []
-  let groupIdList = []
-  if (respArray[0] && respArray[0].hashes) {
-    _forEach(respArray[0].hashes, () => {
-      groupIdList.push(uuidv1())
-    })
-  }
-
-  _forEach(respArray, resp => {
-    _forEach(resp.hashes, (hash, idx) => {
-      let handle = {}
-
-      handle.uri = resp.meta.submitted_to
-      handle.hash = hash.hash
-      handle.hashIdNode = hash.hash_id_node
-      handle.groupId = groupIdList[idx]
-      proofHandles.push(handle)
-    })
-  })
-
-  return proofHandles
-}
-
-/**
- * Parse an Array of proofs, each of which can be in any supported format.
- *
- * @param {Array} proofs - An Array of proofs in any supported form
- * @returns {Array} An Array of parsed proofs
- */
-function _parseProofs(proofs) {
-  if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
-  if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
-
-  let parsedProofs = []
-
-  _forEach(proofs, proof => {
-    if (_isObject(proof)) {
-      // OBJECT
-      parsedProofs.push(cpp.parse(proof))
-    } else if (isJSON(proof)) {
-      // JSON-LD
-      parsedProofs.push(cpp.parse(JSON.parse(proof)))
-    } else if (isBase64(proof) || _isBuffer(proof) || _isHex(proof)) {
-      // BINARY
-      parsedProofs.push(cpp.parse(proof))
-    } else {
-      throw new Error('unknown proof format')
-    }
-  })
-
-  return parsedProofs
-}
-
-/**
- * Flatten an Array of parsed proofs where each proof anchor is
- * represented as an Object with all relevant proof data.
- *
- * @param {Array} parsedProofs - An Array of previously parsed proofs
- * @returns {Array} An Array of flattened proof objects
- */
-function _flattenProofs(parsedProofs) {
-  if (!_isArray(parsedProofs)) throw new Error('parsedProofs arg must be an Array')
-  if (_isEmpty(parsedProofs)) throw new Error('parsedProofs arg must be a non-empty Array')
-
-  let flatProofAnchors = []
-
-  _forEach(parsedProofs, parsedProof => {
-    let proofAnchors = _flattenProofBranches(parsedProof.branches)
-    _forEach(proofAnchors, proofAnchor => {
-      let flatProofAnchor = {}
-      flatProofAnchor.hash = parsedProof.hash
-      flatProofAnchor.hash_id_node = parsedProof.hash_id_node
-      flatProofAnchor.hash_id_core = parsedProof.hash_id_core
-      flatProofAnchor.hash_submitted_node_at = parsedProof.hash_submitted_node_at
-      flatProofAnchor.hash_submitted_core_at = parsedProof.hash_submitted_core_at
-      flatProofAnchor.branch = proofAnchor.branch
-      flatProofAnchor.uri = proofAnchor.uri
-      flatProofAnchor.type = proofAnchor.type
-      flatProofAnchor.anchor_id = proofAnchor.anchor_id
-      flatProofAnchor.expected_value = proofAnchor.expected_value
-      flatProofAnchors.push(flatProofAnchor)
-    })
-  })
-
-  return flatProofAnchors
-}
-
-/**
- * Flatten an Array of proof branches where each proof anchor in
- * each branch is represented as an Object with all relevant data for that anchor.
- *
- * @param {Array} proofBranchArray - An Array of branches for a given level in a proof
- * @returns {Array} An Array of flattened proof anchor objects for each branch
- */
-function _flattenProofBranches(proofBranchArray) {
-  let flatProofAnchors = []
-
-  _forEach(proofBranchArray, proofBranch => {
-    let anchors = proofBranch.anchors
-    _forEach(anchors, anchor => {
-      let flatAnchor = {}
-      flatAnchor.branch = proofBranch.label || undefined
-      flatAnchor.uri = anchor.uris[0]
-      flatAnchor.type = anchor.type
-      flatAnchor.anchor_id = anchor.anchor_id
-      flatAnchor.expected_value = anchor.expected_value
-      flatProofAnchors.push(flatAnchor)
-    })
-    if (proofBranch.branches) {
-      flatProofAnchors = flatProofAnchors.concat(_flattenProofBranches(proofBranch.branches))
-    }
-  })
-  return flatProofAnchors
-}
-
-/**
- * Get raw btc transactions for each hash_id_node
- * @param {Array} proofs - array of previously parsed proofs
- * @return {Obect[]} - an array of objects with hash_id_node and raw btc tx
- */
-function _flattenBtcBranches(proofs) {
-  let flattenedBranches = []
-
-  _forEach(proofs, proof => {
-    let btcAnchor = {}
-    btcAnchor.hash_id_node = proof.hash_id_node
-
-    if (proof.branches) {
-      _forEach(proof.branches, branch => {
-        // sub branches indicate other anchors
-        // we want to find the sub-branch that anchors to btc
-        if (branch.branches) {
-          // get the raw tx from the btc_anchor_branch
-          let btcBranch = branch.branches.find(element => element.label === 'btc_anchor_branch')
-          btcAnchor.raw_btc_tx = btcBranch.rawTx
-          // get the btc anchor
-          let anchor = btcBranch.anchors.find(anchor => anchor.type === 'btc')
-          // add expected_value (i.e. the merkle root of anchored block)
-          btcAnchor.expected_value = anchor.expected_value
-          // add anchor_id (i.e. the anchored block height)
-          btcAnchor.anchor_id = anchor.anchor_id
-        }
-      })
-    }
-
-    flattenedBranches.push(btcAnchor)
-  })
-
-  return flattenedBranches
-}
-
-/**
- * validate and normalize proofs for actions such as parsing
- * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be verified. Proofs can be in any of the supported JSON-LD or Binary formats.
- @return {Array<Object>} - An Array of Objects, one for each proof submitted.
- */
-function _normalizeProofs(proofs) {
-  // Validate proofs arg
-  if (!_isArray(proofs)) throw new Error('proofs arg must be an Array')
-  if (_isEmpty(proofs)) throw new Error('proofs arg must be a non-empty Array')
-
-  // If any entry in the proofs Array is an Object, process
-  // it assuming the same form as the output of getProofs().
-  return _map(proofs, proof => {
-    if (_isObject(proof) && _has(proof, 'proof') && _isString(proof.proof)) {
-      // Probably result of `submitProofs()` call. Extract proof String
-      return proof.proof
-    } else if (_isObject(proof) && _has(proof, 'type') && proof.type === 'Chainpoint') {
-      // Probably a JS Object Proof
-      return proof
-    } else if (_isString(proof) && (isJSON(proof) || isBase64(proof))) {
-      // Probably a JSON String or Base64 encoded binary proof
-      return proof
-    } else {
-      throw new Error('proofs arg Array has elements that are not Objects or Strings')
-    }
   })
 }
 
@@ -486,7 +211,7 @@ export function submitHashes(hashes, uris, callback) {
   if (_isEmpty(hashes)) throw new Error('hashes arg must be a non-empty Array')
   if (hashes.length > 250) throw new Error('hashes arg must be an Array with <= 250 elements')
   let rejects = _reject(hashes, function(h) {
-    return _isHex(h)
+    return isHex(h)
   })
   if (!_isEmpty(rejects)) throw new Error(`hashes arg contains invalid hashes : ${rejects.join(', ')}`)
 
@@ -503,7 +228,7 @@ export function submitHashes(hashes, uris, callback) {
 
     // non-empty, check that *all* are valid or throw
     let badURIs = _reject(uris, function(h) {
-      return _isValidNodeURI(h)
+      return isValidNodeURI(h)
     })
     if (!_isEmpty(badURIs)) throw new Error(`uris arg contains invalid URIs : ${badURIs.join(', ')}`)
     // all provided URIs were valid
@@ -517,13 +242,13 @@ export function submitHashes(hashes, uris, callback) {
         // Setup an options Object for each Node we'll submit hashes to.
         // Each Node will then be sent the full Array of hashes.
         let nodesWithPostOpts = _map(nodes, node => {
-          let uri = _isSecureOrigin() ? NODE_PROXY_URI : node
+          let uri = isSecureOrigin() ? NODE_PROXY_URI : node
           let headers = Object.assign(
             {
               'Content-Type': 'application/json',
               Accept: 'application/json'
             },
-            _isSecureOrigin()
+            isSecureOrigin()
               ? {
                   'X-Node-Uri': node
                 }
@@ -558,7 +283,7 @@ export function submitHashes(hashes, uris, callback) {
             })
 
             // Map the API response to a form easily consumable by getProofs
-            let proofHandles = _mapSubmitHashesRespToProofHandles(parsedBody)
+            let proofHandles = mapSubmitHashesRespToProofHandles(parsedBody)
 
             resolve(proofHandles)
             return callback(null, proofHandles)
@@ -684,7 +409,7 @@ export function getProofs(proofHandles, callback) {
   if (_isEmpty(proofHandles)) throw new Error('proofHandles arg must be a non-empty Array')
   if (
     !_every(proofHandles, h => {
-      return _isValidProofHandle(h)
+      return isValidProofHandle(h)
     })
   )
     throw new Error('proofHandles Array contains invalid Objects')
@@ -692,7 +417,7 @@ export function getProofs(proofHandles, callback) {
 
   // Validate that *all* URI's provided are valid or throw
   let badHandleURIs = _reject(proofHandles, function(u) {
-    return _isValidNodeURI(u.uri)
+    return isValidNodeURI(u.uri)
   })
   if (!_isEmpty(badHandleURIs))
     throw new Error(
@@ -703,7 +428,7 @@ export function getProofs(proofHandles, callback) {
 
   // Validate that *all* hashIdNode's provided are valid or throw
   let badHandleUUIDs = _reject(proofHandles, function(u) {
-    return _isValidUUID(u.hashIdNode)
+    return isValidUUID(u.hashIdNode)
   })
   if (!_isEmpty(badHandleUUIDs))
     throw new Error(
@@ -736,7 +461,7 @@ export function getProofs(proofHandles, callback) {
           {
             hashids: uuidsByNode[node].join(',')
           },
-          _isSecureOrigin()
+          isSecureOrigin()
             ? {
                 'X-Node-Uri': node
               }
@@ -744,7 +469,7 @@ export function getProofs(proofHandles, callback) {
         )
         let getOptions = {
           method: 'GET',
-          uri: (_isSecureOrigin() ? NODE_PROXY_URI : node) + '/proofs',
+          uri: (isSecureOrigin() ? NODE_PROXY_URI : node) + '/proofs',
           body: {},
           headers,
           timeout: 10000
@@ -811,7 +536,7 @@ export function verifyProofs(proofs, uri, callback) {
     nodesPromise = getNodes(1)
   } else {
     if (!_isString(uri)) throw new Error('uri arg must be a String')
-    if (!_isValidNodeURI(uri)) throw new Error(`uri arg contains invalid Node URI : ${uri}`)
+    if (!isValidNodeURI(uri)) throw new Error(`uri arg contains invalid Node URI : ${uri}`)
     nodesPromise = Promise.resolve([uri])
   }
 
@@ -847,14 +572,14 @@ export function verifyProofs(proofs, uri, callback) {
                 'Content-Type': 'application/json',
                 Accept: 'application/json'
               },
-              _isSecureOrigin()
+              isSecureOrigin()
                 ? {
                     'X-Node-Uri': url.parse(anchorURI).protocol + '//' + url.parse(anchorURI).host
                   }
                 : {}
             )
 
-            let uri = _isSecureOrigin() ? NODE_PROXY_URI + url.parse(anchorURI).path : anchorURI
+            let uri = isSecureOrigin() ? NODE_PROXY_URI + url.parse(anchorURI).path : anchorURI
 
             return {
               method: 'GET',
@@ -942,9 +667,9 @@ export function verifyProofs(proofs, uri, callback) {
  * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be evaluated. Proofs can be in any of the supported JSON-LD or Binary formats.
  */
 export function evaluateProofs(proofs) {
-  let normalizedProofs = _normalizeProofs(proofs)
-  let parsedProofs = _parseProofs(normalizedProofs)
-  let flatProofs = _flattenProofs(parsedProofs)
+  let normalizedProofs = normalizeProofs(proofs)
+  let parsedProofs = parseProofs(normalizedProofs)
+  let flatProofs = flattenProofs(parsedProofs)
 
   return flatProofs
 }
@@ -956,9 +681,9 @@ export function evaluateProofs(proofs) {
  */
 
 export function getProofTxs(proofs) {
-  let normalizedProofs = _normalizeProofs(proofs)
-  let parsedProofs = _parseProofs(normalizedProofs)
-  let flatProofs = _flattenBtcBranches(parsedProofs)
+  let normalizedProofs = normalizeProofs(proofs)
+  let parsedProofs = parseProofs(normalizedProofs)
+  let flatProofs = flattenBtcBranches(parsedProofs)
   return flatProofs
 }
 
