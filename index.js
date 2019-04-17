@@ -34,7 +34,6 @@ import _isEqual from 'lodash/isEqual'
 
 const dns = require('dns')
 const url = require('url')
-const crypto = require('crypto')
 const fs = require('fs')
 const fetch = require('node-fetch')
 
@@ -51,45 +50,13 @@ const {
   flattenProofs,
   mapSubmitHashesRespToProofHandles,
   normalizeProofs,
-  parseProofs
+  parseProofs,
+  promiseMap,
+  sha256FileByPath
 } = utils
 
+// CONSTANTS
 const NODE_PROXY_URI = 'https://node-proxy.chainpoint.org:443'
-
-const promiseMap = (arr, fn) => {
-  return Promise.all(
-    arr.map(currVal => {
-      let obj = JSON.parse(JSON.stringify(currVal))
-      let method = obj.method
-      let uri = obj.uri
-      let body = obj.body
-
-      delete obj.method
-      delete obj.uri
-      delete obj.body
-
-      switch (method) {
-        case 'GET':
-          return fn(uri, obj).then(res => {
-            let res1 = res.clone()
-
-            return res.json().catch(() => res1.text())
-          })
-        case 'POST':
-          return fn(uri, {
-            method,
-            ...obj,
-            body: JSON.stringify(body)
-          }).then(res => {
-            let res1 = res.clone()
-
-            return res.json().catch(() => res1.text())
-          })
-      }
-    })
-  )
-}
-
 const DNS_CORE_DISCOVERY_ADDR = '_core.addr.chainpoint.org'
 
 /**
@@ -361,31 +328,6 @@ export function submitFileHashes(paths, uris, callback) {
   }).catch(err => {
     console.error(err.message)
     throw err
-  })
-}
-
-function sha256FileByPath(path) {
-  return new Promise((resolve, reject) => {
-    let sha256 = crypto.createHash('sha256')
-    let readStream = fs.createReadStream(path)
-    readStream.on('data', data => sha256.update(data))
-    readStream.on('end', () => {
-      let hash = sha256.digest('hex')
-      resolve({
-        path,
-        hash
-      })
-    })
-    readStream.on('error', err => {
-      if (err.code === 'EACCES') {
-        resolve({
-          path: path,
-          hash: null,
-          error: 'EACCES'
-        })
-      }
-      reject(err)
-    })
   })
 }
 
