@@ -9,7 +9,7 @@
   "scripts": {
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "lint": "eslint *.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node node-test.js",
     "webpack": "webpack",
     "prepublish": "webpack"
   },
