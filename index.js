@@ -38,7 +38,9 @@ const crypto = require('crypto')
 const fs = require('fs')
 const fetch = require('node-fetch')
 
-import {
+import utils from './lib/utils'
+
+const {
   isHex,
   isSecureOrigin,
   isValidCoreURI,
@@ -50,7 +52,7 @@ import {
   mapSubmitHashesRespToProofHandles,
   normalizeProofs,
   parseProofs
-} from './lib/utils'
+} = utils
 
 const NODE_PROXY_URI = 'https://node-proxy.chainpoint.org:443'
 
