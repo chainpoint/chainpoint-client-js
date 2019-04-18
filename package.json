@@ -10,7 +10,7 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "lint": "eslint lib/**/*.js *.js",
-    "test": "nyc mocha --reporter spec tests/*-test.js",
+    "test": "npm run webpack && nyc mocha --reporter spec tests/*-test.js",
     "test:watch": "mocha --reporter spec --watch tests/*-test.js",
     "webpack": "webpack",
     "prepublishOnly": "webpack"
