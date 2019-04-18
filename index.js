@@ -14,11 +14,7 @@
 import _isString from 'lodash/isString'
 import _isEmpty from 'lodash/isEmpty'
 import _isFunction from 'lodash/isFunction'
-import _isInteger from 'lodash/isInteger'
 import _map from 'lodash/map'
-import _shuffle from 'lodash/shuffle'
-import _filter from 'lodash/filter'
-import _slice from 'lodash/slice'
 import _first from 'lodash/first'
 import _isArray from 'lodash/isArray'
 import _forEach from 'lodash/forEach'
@@ -32,17 +28,16 @@ import _camelCase from 'lodash/camelCase'
 import _uniqWith from 'lodash/uniqWith'
 import _isEqual from 'lodash/isEqual'
 
-const dns = require('dns')
 const url = require('url')
 const fs = require('fs')
 const fetch = require('node-fetch')
 
 import utils from './lib/utils'
+import { NODE_PROXY_URI } from './lib/constants'
 
 const {
   isHex,
   isSecureOrigin,
-  isValidCoreURI,
   isValidNodeURI,
   isValidProofHandle,
   isValidUUID,
@@ -52,112 +47,10 @@ const {
   normalizeProofs,
   parseProofs,
   promiseMap,
-  sha256FileByPath
+  sha256FileByPath,
+  getCores,
+  getNodes
 } = utils
-
-// CONSTANTS
-const NODE_PROXY_URI = 'https://node-proxy.chainpoint.org:443'
-const DNS_CORE_DISCOVERY_ADDR = '_core.addr.chainpoint.org'
-
-/**
- * Retrieve an Array of discovered Core URIs. Returns one Core URI by default.
- *
- * @param {Integer} num - Max number of Core URI's to return.
- * @param {function} callback - An optional callback function.
- * @returns {string} - Returns either a callback or a Promise with an Array of Core URI strings.
- */
-export function getCores(num, callback) {
-  callback = callback || function() {}
-  num = num || 1
-
-  if (!_isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
-
-  return new Promise(function(resolve, reject) {
-    if (dns && _isFunction(dns.resolveTxt)) {
-      dns.resolveTxt(DNS_CORE_DISCOVERY_ADDR, (err, records) => {
-        if (err) {
-          reject(err)
-          return callback(err)
-        }
-
-        if (_isEmpty(records)) {
-          let err = new Error('no core addresses available')
-          reject(err)
-          return callback(err)
-        }
-
-        let cores = _map(records, coreIP => {
-          return 'https://' + coreIP
-        })
-
-        // randomize the order
-        let shuffledCores = _shuffle(cores)
-        // only return cores with valid addresses (should be all)
-        let filteredCores = _filter(shuffledCores, function(c) {
-          return isValidCoreURI(c)
-        })
-        // only return num cores
-        let slicedCores = _slice(filteredCores, 0, num)
-
-        resolve(slicedCores)
-        return callback(null, slicedCores)
-      })
-    } else {
-      // `dns` module is not available in the browser
-      // fallback to simple random selection of Cores
-      let cores = ['https://a.chainpoint.org', 'https://b.chainpoint.org', 'https://c.chainpoint.org']
-      let slicedCores = _slice(_shuffle(cores), 0, num)
-      resolve(slicedCores)
-      return callback(null, slicedCores)
-    }
-  })
-}
-
-/**
- * Retrieve an Array of discovered Node URIs. Returns three Node URIs by default.
- * Can only return up to the number of Nodes that Core provides.
- *
- * @param {Integer} num - Max number of Node URIs to return.
- * @param {function} callback - An optional callback function.
- * @returns {Array<String>} - Returns either a callback or a Promise with an Array of Node URI strings
- */
-export function getNodes(num, callback) {
-  callback = callback || function() {}
-  num = num || 3
-
-  if (!_isInteger(num) || num < 1) throw new Error('num arg must be an Integer >= 1')
-
-  return new Promise(function(resolve, reject) {
-    getCores(1)
-      .then(coreURI => {
-        let getNodeURI = _first(coreURI) + '/nodes/random'
-        return fetch(getNodeURI)
-          .then(res => res.json())
-          .then(response => {
-            // extract public_uri from each node object
-            let nodes = _map(response, 'public_uri')
-            // randomize the order
-            let shuffledNodes = _shuffle(nodes)
-            // only return nodes with valid addresses (should be all)
-            let filteredNodes = _filter(shuffledNodes, function(n) {
-              return isValidNodeURI(n)
-            })
-            // only return maxNodes nodes
-            let slicedNodes = _slice(filteredNodes, 0, num)
-            // We should never return an empty array of nodes
-            if (!slicedNodes.length)
-              throw new Error('There seems to be an issue retrieving a list of available nodes. Please try again.')
-
-            resolve(slicedNodes)
-            return callback(null, slicedNodes)
-          })
-      })
-      .catch(err => {
-        reject(err)
-        return callback(err)
-      })
-  })
-}
 
 /**
  * Submit hash(es) to one or more Nodes, returning an Array of proof handle objects, one for each submitted hash and Node combination.
