@@ -347,7 +347,7 @@ export function getProofTxs(proofs) {
   return flatProofs
 }
 
-// work to keep expected import structure to maintain backwards compatibility
+// Need this to keep expected import structure for backwards compatibility
 // with downstream dependencies
 export const submitHashes = _submitHashes
 export const submitFileHashes = _submitFileHashes
