@@ -29,200 +29,25 @@ import _uniqWith from 'lodash/uniqWith'
 import _isEqual from 'lodash/isEqual'
 
 const url = require('url')
-const fs = require('fs')
 const fetch = require('node-fetch')
 
 import utils from './lib/utils'
 import { NODE_PROXY_URI } from './lib/constants'
+import _submitHashes, { submitFileHashes as _submitFileHashes } from './lib/submit'
 
 const {
-  isHex,
   isSecureOrigin,
   isValidNodeURI,
   isValidProofHandle,
   isValidUUID,
   flattenBtcBranches,
   flattenProofs,
-  mapSubmitHashesRespToProofHandles,
   normalizeProofs,
   parseProofs,
   promiseMap,
-  sha256FileByPath,
   getCores,
   getNodes
 } = utils
-
-/**
- * Submit hash(es) to one or more Nodes, returning an Array of proof handle objects, one for each submitted hash and Node combination.
- * @param {Array<String>} hashes - An Array of String Hashes in Hexadecimal form.
- * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
- * @return {Array<{uri: String, hash: String, hashIdNode: String, groupId: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
- */
-export function submitHashes(hashes, uris, callback) {
-  uris = uris || []
-  callback = callback || function() {}
-  let nodesPromise
-
-  // Validate callback is a function
-  if (!_isFunction(callback)) throw new Error('callback arg must be a function')
-
-  // Validate all hashes provided
-  if (!_isArray(hashes)) throw new Error('hashes arg must be an Array')
-  if (_isEmpty(hashes)) throw new Error('hashes arg must be a non-empty Array')
-  if (hashes.length > 250) throw new Error('hashes arg must be an Array with <= 250 elements')
-  let rejects = _reject(hashes, function(h) {
-    return isHex(h)
-  })
-  if (!_isEmpty(rejects)) throw new Error(`hashes arg contains invalid hashes : ${rejects.join(', ')}`)
-
-  // Validate all Node URIs provided
-  if (!_isArray(uris)) throw new Error('uris arg must be an Array of String URIs')
-  if (uris.length > 5) throw new Error('uris arg must be an Array with <= 5 elements')
-
-  if (_isEmpty(uris)) {
-    // get a list of nodes via service discovery
-    nodesPromise = getNodes(3)
-  } else {
-    // eliminate duplicate URIs
-    uris = _uniq(uris)
-
-    // non-empty, check that *all* are valid or throw
-    let badURIs = _reject(uris, function(h) {
-      return isValidNodeURI(h)
-    })
-    if (!_isEmpty(badURIs)) throw new Error(`uris arg contains invalid URIs : ${badURIs.join(', ')}`)
-    // all provided URIs were valid
-    nodesPromise = Promise.resolve(uris)
-  }
-
-  return new Promise(function(resolve, reject) {
-    // Resolve an Array of Nodes from service discovery or the arg provided
-    nodesPromise
-      .then(nodes => {
-        // Setup an options Object for each Node we'll submit hashes to.
-        // Each Node will then be sent the full Array of hashes.
-        let nodesWithPostOpts = _map(nodes, node => {
-          let uri = isSecureOrigin() ? NODE_PROXY_URI : node
-          let headers = Object.assign(
-            {
-              'Content-Type': 'application/json',
-              Accept: 'application/json'
-            },
-            isSecureOrigin()
-              ? {
-                  'X-Node-Uri': node
-                }
-              : {}
-          )
-
-          let postOptions = {
-            method: 'POST',
-            uri: uri + '/hashes',
-            body: {
-              hashes: hashes
-            },
-            headers,
-            timeout: 10000
-          }
-          return postOptions
-        })
-
-        // All requests succeed in parallel or all fail.
-        promiseMap(nodesWithPostOpts, fetch, {
-          concurrency: 25
-        }).then(
-          parsedBody => {
-            // Nodes cannot be guaranteed to know what IP address they are reachable
-            // at, so we need to amend each result with the Node URI it was submitted
-            // to so that proofs may later be retrieved from the appropriate Node(s).
-            // This mapping relies on that fact that promiseMap returns results in the
-            // same order that options were passed to it so the results can be mapped to
-            // the Nodes submitted to.
-            _forEach(nodes, (uri, index) => {
-              parsedBody[index].meta.submitted_to = uri
-            })
-
-            // Map the API response to a form easily consumable by getProofs
-            let proofHandles = mapSubmitHashesRespToProofHandles(parsedBody)
-
-            resolve(proofHandles)
-            return callback(null, proofHandles)
-          },
-          function(err) {
-            reject(err)
-            return callback(err)
-          }
-        )
-      })
-      .catch(err => {
-        console.error(err.message)
-        throw err
-      })
-  })
-}
-
-/**
- * Submit hash(es) of selected file(s) to one or more Nodes, returning an Array of proof handle objects, one for each submitted hash and Node combination.
- * @param {Array<String>} paths - An Array of paths of the files to be hashed.
- * @param {Array<String>} uris - An Array of String URI's. Each hash will be submitted to each Node URI provided. If none provided three will be chosen at random using service discovery.
- * @return {Array<{path: String, uri: String, hash: String, hashIdNode: String, groupId: String}>} An Array of Objects, each a handle that contains all info needed to retrieve a proof.
- */
-export function submitFileHashes(paths, uris, callback) {
-  callback = callback || function() {}
-  uris = uris || []
-
-  // Validate callback is a function
-  if (!_isFunction(callback)) throw new Error('callback arg must be a function')
-
-  // Validate all paths provided
-  if (!_isArray(paths)) throw new Error('paths arg must be an Array')
-  if (_isEmpty(paths)) throw new Error('paths arg must be a non-empty Array')
-  if (paths.length > 250) throw new Error('paths arg must be an Array with <= 250 elements')
-  let rejects = _reject(paths, path => fs.existsSync(path) && fs.lstatSync(path).isFile())
-  if (!_isEmpty(rejects)) throw new Error(`paths arg contains invalid paths : ${rejects.join(', ')}`)
-
-  // Validate all Node URIs provided
-  if (!_isArray(uris)) throw new Error('uris arg must be an Array of String URIs')
-  if (uris.length > 5) throw new Error('uris arg must be an Array with <= 5 elements')
-
-  return new Promise(async function(resolve, reject) {
-    let hashObjs = []
-    try {
-      hashObjs = await Promise.all(paths.map(path => sha256FileByPath(path)))
-    } catch (err) {
-      reject(err)
-      return callback(err)
-    }
-
-    // filter out any EACCES errors
-    hashObjs = hashObjs.filter(hashObj => {
-      if (hashObj.error === 'EACCES') console.error(`Insufficient permission to read file '${hashObj.path}', skipping`)
-      return hashObj.error !== 'EACCES'
-    })
-    if (hashObjs.length === 0) {
-      resolve([])
-      return callback(null, [])
-    }
-
-    submitHashes(hashObjs.map(hashObj => hashObj.hash), uris).then(
-      proofHandles => {
-        proofHandles = proofHandles.map(proofHandle => {
-          proofHandle.path = hashObjs.find(hashObj => hashObj.hash === proofHandle.hash).path
-          return proofHandle
-        })
-        resolve(proofHandles)
-        return callback(null, proofHandles)
-      },
-      function(err) {
-        reject(err)
-        return callback(err)
-      }
-    )
-  }).catch(err => {
-    console.error(err.message)
-    throw err
-  })
-}
 
 /**
  * Retrieve a collection of proofs for one or more hash IDs from the appropriate Node(s)
@@ -522,11 +347,16 @@ export function getProofTxs(proofs) {
   return flatProofs
 }
 
+// work to keep expected import structure to maintain backwards compatibility
+// with downstream dependencies
+export const submitHashes = _submitHashes
+export const submitFileHashes = _submitFileHashes
+
 export default {
   getCores,
   getNodes,
-  submitHashes,
-  submitFileHashes,
+  submitHashes: _submitHashes,
+  submitFileHashes: _submitFileHashes,
   getProofs,
   verifyProofs,
   evaluateProofs,
