@@ -2,7 +2,7 @@ const chp = require('../dist/bundle')
 const fs = require('fs')
 const { expect } = require('chai')
 
-describe('bundle', function() {
+describe('E2E tests', function() {
   this.timeout(30000)
   let hashes, proofHandlesHashes, proofHandlesFiles, proofs
 
