@@ -63,7 +63,7 @@ describe('helpers utilities', () => {
     })
   })
 
-  describe('promiseMap', () => {
+  describe('fetchEndpoints', () => {
     it('should return all responses from designated endpoints', () => {
       throw new Error('Test not implemented!')
     })
