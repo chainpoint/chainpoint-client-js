@@ -18,7 +18,7 @@ describe('helpers utilities', () => {
   })
   describe('isHex', () => {
     it('should test for valid hexadecimal strings', () => {
-      const buf = new Buffer.from([149, 236, 195, 128, 175, 233, 17, 228, 155, 108, 117, 27, 102, 221, 84, 30], 'hex')
+      const buf = new Buffer.from('hello world', 'utf8')
       const hex = buf.toString('hex')
       expect(helpers.isHex(hex)).to.be.true
       expect(helpers.isHex('foo bar')).to.be.false
@@ -132,6 +132,7 @@ describe('helpers utilities', () => {
       let firstError = false
       let secondError = false
 
+      // need to do this in try/catches because they are async functions
       try {
         await getFileHashes('foobar.txt')
       } catch (e) {
