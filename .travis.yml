@@ -6,11 +6,13 @@ cache:
     - node_modules
 before_script: yarn run webpack
 script:
-  - yarn run $TEST_TYPE
+  - yarn run test:$TEST_TYPE
 after_success: yarn run coverage
 matrix:
   include:
     - name: 'style tests'
       env: TEST_TYPE=lint
     - name: 'unit tests'
-      env: TEST_TYPE=test
+      env: TEST_TYPE=unit
+    - name: 'e2e tests'
+      env: TEST_TYPE=e2e
