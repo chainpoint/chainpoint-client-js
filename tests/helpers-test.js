@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import fs from 'bfile'
 import crypto from 'crypto'
 import path from 'path'
+import nock from 'nock'
 
 describe('helpers utilities', () => {
   let testPath
@@ -13,6 +14,7 @@ describe('helpers utilities', () => {
 
   after(async () => {
     await fs.remove(testPath)
+    nock.cleanAll()
   })
   describe('isHex', () => {
     it('should test for valid hexadecimal strings', () => {
@@ -64,11 +66,20 @@ describe('helpers utilities', () => {
   })
 
   describe('fetchEndpoints', () => {
-    it('should return all responses from designated endpoints', () => {
-      throw new Error('Test not implemented!')
-    })
-    it('should should only run for GET and POST requests', () => {
-      throw new Error('Test not implemented!')
+    it('should return all responses from designated endpoints', async () => {
+      let requests = [
+        { uri: 'http://test.com', method: 'GET', mockResponse: 'GET success!' },
+        { uri: 'http://test.com', method: 'POST', body: { foo: 'bar' }, mockResponse: 'POST success!' }
+      ]
+      requests.forEach(({ uri, method, body, mockResponse }) =>
+        nock(uri)
+          .intercept('/', method, body)
+          .reply(200, { data: mockResponse })
+      )
+
+      const fetchMap = await helpers.fetchEndpoints(requests)
+      console.log('res', fetchMap)
+      fetchMap.forEach((res, index) => expect(res.data).to.equal(requests[index].mockResponse))
     })
   })
 
