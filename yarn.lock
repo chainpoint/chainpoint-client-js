@@ -1202,6 +1202,11 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
+bfile@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/bfile/-/bfile-0.2.1.tgz#2d19ac27f355fef861d5d1a4cd0e4a7f27bb4151"
+  integrity sha512-du2QjKNkqZ1YJweWEQeq3CEqd+nQD/WOnmAMfs52ok5ujBBagWYLZC5ORDuqfV2fuF88of44PZdsnAVfxoH31g==
+
 big.js@^3.1.3:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
