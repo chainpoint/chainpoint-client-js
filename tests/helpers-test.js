@@ -78,7 +78,6 @@ describe('helpers utilities', () => {
       )
 
       const fetchMap = await helpers.fetchEndpoints(requests)
-      console.log('res', fetchMap)
       fetchMap.forEach((res, index) => expect(res.data).to.equal(requests[index].mockResponse))
     })
   })
