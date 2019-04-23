@@ -1506,6 +1506,7 @@ chai@^4.1.2, chai@^4.2.0:
 chainpoint-binary@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/chainpoint-binary/-/chainpoint-binary-4.0.2.tgz#dd55f18e856552e86650bba95da6c888ee0b835d"
+  integrity sha512-WzZBbzV5yX3i2Dq6+JI6tG5UJ0vM+4dcUhiXcif7kFjz0tbYN2rKLzrLgsk9l2+bw+/rvuZfLVSVDMZzMtfTcQ==
   dependencies:
     chainpoint-proof-json-schema "^1.0.2"
     msgpack-lite "^0.1.26"
