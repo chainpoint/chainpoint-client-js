@@ -1,6 +1,7 @@
 const chp = require('../dist/bundle')
 const fs = require('fs')
 const { expect } = require('chai')
+const nodes = require('./data/nodes')
 
 describe('E2E tests', function() {
   this.timeout(30000)
@@ -14,16 +15,16 @@ describe('E2E tests', function() {
     ]
   })
 
-  it('should submit each hash to three randomly selected nodes', async () => {
+  it('should submit each hash to three known good nodes', async () => {
     // Submit each hash to three randomly selected Nodes
-    proofHandlesHashes = await chp.submitHashes(hashes)
+    proofHandlesHashes = await chp.submitHashes(hashes, nodes)
     let paths = fs
       .readdirSync('./')
       .map(file => `./${file}`)
       .filter(file => fs.lstatSync(file).isFile())
 
     // Submit each hash to three randomly selected Nodes
-    proofHandlesFiles = await chp.submitFileHashes(paths)
+    proofHandlesFiles = await chp.submitFileHashes(paths, nodes)
     expect(proofHandlesFiles).to.exist
   })
 

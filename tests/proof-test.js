@@ -83,13 +83,28 @@ describe('proof utilities', () => {
   })
 
   describe('normalizeProofs', () => {
-    it('should throw on incorrectly passed args', () => {
+    it('should skip incorrectly passed args', () => {
       testArrayArg(normalizeProofs)
-      let incorrectProofType = () => normalizeProofs([{ type: 'foobar' }])
-      let emptyProofObject = () => normalizeProofs([{}])
-      let testFns = [incorrectProofType, emptyProofObject]
+      let normalized = []
+      let incorrectProofType = () => {
+        let proof = normalizeProofs([{ type: 'foobar' }])
+        console.log(proof)
+        console.log(proof.length)
+        normalized.push(...proof)
+      }
+      let emptyProofObject = () => {
+        let proof = normalizeProofs([{}])
+        normalized.push(...proof)
+      }
+      let nullProof = () => {
+        let proof = normalizeProofs([{ hashIdNode: 'i-am-an-id' }])
+        normalized.push(...proof)
+      }
+      let testFns = [incorrectProofType, emptyProofObject, nullProof]
 
-      testFns.forEach(test => expect(test, `invoking with ${test.name} should have thrown an error`).to.throw())
+      testFns.forEach(test => expect(test, `invoking with ${test.name} should not have thrown an error`).not.to.throw())
+      console.log(normalized)
+      expect(normalized).to.have.length(0)
     })
 
     it('should normalize parsed proof objects', () => {
@@ -98,6 +113,8 @@ describe('proof utilities', () => {
       let normalized = normalizeProofs(parsedProofs)
       expect(normalized[0]).to.equal(parsedProofs[0])
     })
+
+    it('should skip a proof object ')
 
     it('should normalize a raw proof binary or submit hashes response', () => {
       let testProofs = [...proofs]
