@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const { expect } = require('chai')
+import { expect } from 'chai'
 
 import submitHashes from './data/submit-hashes.json'
 import proofs from './data/proofs.json'
@@ -25,6 +25,7 @@ import {
   // flattenBtcBranches,
   normalizeProofs
 } from '../lib/utils/proofs'
+import { testArrayArg } from './helpers'
 
 describe('proof utilities', () => {
   describe('isValidProofHandle', () => {
@@ -188,10 +189,3 @@ describe('proof utilities', () => {
     it('should return an array of objects with hash_id_node and raw btc tx')
   })
 })
-
-function testArrayArg(fn) {
-  let emptyArray = () => fn([])
-  let notArray = () => fn('not an array')
-  expect(emptyArray, 'Did not throw when passed an empty array').to.throw()
-  expect(notArray, 'Did not throw when passed a non-array').to.throw()
-}
