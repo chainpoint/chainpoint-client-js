@@ -11,6 +11,7 @@
  * limitations under the License.
  */
 import { expect } from 'chai'
+import sinon from 'sinon'
 
 import submitHashes from './data/submit-hashes.json'
 import proofs from './data/proofs.json'
@@ -83,28 +84,18 @@ describe('proof utilities', () => {
   })
 
   describe('normalizeProofs', () => {
-    it('should skip incorrectly passed args', () => {
+    beforeEach(() => {
+      sinon.spy(console, 'error')
+    })
+    afterEach(() => {
+      console.error.restore()
+    })
+    it('should skip incorrectly passed args and log errors', () => {
       testArrayArg(normalizeProofs)
-      let normalized = []
-      let incorrectProofType = () => {
-        let proof = normalizeProofs([{ type: 'foobar' }])
-        console.log(proof)
-        console.log(proof.length)
-        normalized.push(...proof)
-      }
-      let emptyProofObject = () => {
-        let proof = normalizeProofs([{}])
-        normalized.push(...proof)
-      }
-      let nullProof = () => {
-        let proof = normalizeProofs([{ hashIdNode: 'i-am-an-id' }])
-        normalized.push(...proof)
-      }
-      let testFns = [incorrectProofType, emptyProofObject, nullProof]
-
-      testFns.forEach(test => expect(test, `invoking with ${test.name} should not have thrown an error`).not.to.throw())
-      console.log(normalized)
-      expect(normalized).to.have.length(0)
+      // empty array, null proof, or non-chainpoint type proofs should all fail gracefully
+      let normalized = normalizeProofs([{}, { hashIdNode: 'i-am-an-id', proof: null }, { type: 'foobar' }])
+      expect(normalized, 'Array of normalized invalid proofs should have been empty').to.have.length(0)
+      expect(console.error.calledThrice, 'Did not log errors for each incorrect proof object').to.be.true
     })
 
     it('should normalize parsed proof objects', () => {
