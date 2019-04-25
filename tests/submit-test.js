@@ -25,8 +25,11 @@ import nodes from './data/nodes'
 describe('submitHashes', () => {
   let mockResponses
   beforeEach(async () => {
+    // steb getNodes so that we can be sure it was called
+    // but can control what it returns and test expectations
     let stub = sinon.stub(network, 'getNodes')
     stub.returns(nodes)
+
     mockResponses = nodes.map((uri, index) =>
       nock(uri)
         .persist()
@@ -40,6 +43,7 @@ describe('submitHashes', () => {
     nock.cleanAll()
     sinon.restore()
   })
+
   it('should reject invalid hashes arg', async () => {
     let emptyArray, notArray, notHex
 
@@ -73,7 +77,7 @@ describe('submitHashes', () => {
     } catch (e) {
       bigArray = e.message
     }
-    expect(bigArray).to.have.string('5 elements', 'Should have thrown with a uris array of more than 5 elements')
+    expect(bigArray).to.have.string('5 elements', 'Should have thrown with a uris arg of more than 5 elements')
 
     try {
       await submitHashes(hashes, 'not an array')
@@ -94,6 +98,7 @@ describe('submitHashes', () => {
     await submitHashes(hashes)
     expect(network.getNodes.called).to.be.true
   })
+
   it('should send POST request to nodes with hashes in the request body', async () => {
     // nock doesn't give us a good way to check the request bodies
     // so we need to add a check to each mocked request/response
@@ -103,7 +108,7 @@ describe('submitHashes', () => {
     nodes.forEach(uri => (reqBodies[uri] = false))
     mockResponses = mockResponses.map(mock =>
       mock.filteringRequestBody(body => {
-        // remove the port at the end of the uri
+        // remove the port ":80" at the end of the uri
         let uri = mock.basePath.slice(0, -3)
         body = JSON.parse(body)
         // check the body in the req for this uri has the hashes
@@ -116,6 +121,7 @@ describe('submitHashes', () => {
     mockResponses.forEach(resp => expect(resp.isDone()).to.be.true)
     nodes.forEach(uri => expect(reqBodies[uri]).to.be.true)
   })
+
   it('should return mapped proof handles after successful submission', async () => {
     sinon.spy(proofs, 'mapSubmitHashesRespToProofHandles')
     let testHandles = await submitHashes(hashes)

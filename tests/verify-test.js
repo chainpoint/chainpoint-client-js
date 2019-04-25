@@ -29,6 +29,7 @@ describe('verifyProofs', () => {
   beforeEach(() => {
     nock.cleanAll()
   })
+
   it('should evaluate proofs', async () => {
     sinon.spy(evaluate, 'evaluateProofs')
     await verifyProofs(proof)
@@ -69,6 +70,7 @@ describe('verifyProofs', () => {
     await verifyProofs(proof, uri)
     expect(nock.isDone()).to.be.true
   })
+
   it('should throw if no hashes found/returned', async () => {
     nock(uri)
       .get(`/calendar/${evaluatedProof['anchor_id']}/hash`)

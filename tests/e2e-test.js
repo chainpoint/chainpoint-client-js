@@ -23,7 +23,7 @@ describe('E2E tests', function() {
       .map(file => `./${file}`)
       .filter(file => fs.lstatSync(file).isFile())
 
-    // Submit each hash to three randomly selected Nodes
+    // Submit each hash to three known nodes
     proofHandlesFiles = await chp.submitFileHashes(paths, nodes)
     expect(proofHandlesFiles).to.exist
   })
