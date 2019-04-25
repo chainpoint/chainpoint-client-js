@@ -23,7 +23,7 @@ let base = {
 }
 
 let web = {
-  entry: './index.js',
+  entry: ['@babel/polyfill', './index.js'],
   target: 'web',
   node: {
     dgram: 'empty',
