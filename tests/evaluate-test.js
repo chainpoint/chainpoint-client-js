@@ -10,18 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { normalizeProofs, parseProofs, flattenProofs } from './utils/proofs'
-/**
- * Evaluates the expected anchor values for a collection of proofs
- *
- * @param {Array} proofs - An Array of String, or Object proofs from getProofs(), to be evaluated. Proofs can be in any of the supported JSON-LD or Binary formats.
- */
-export function evaluateProofs(proofs) {
-  let normalizedProofs = normalizeProofs(proofs)
-  let parsedProofs = parseProofs(normalizedProofs)
-  let flatProofs = flattenProofs(parsedProofs)
+import { expect } from 'chai'
 
-  return flatProofs
-}
+import { evaluateProofs } from '../index'
+import { normalizeProofs, flattenProofs, parseProofs } from '../lib/utils/proofs'
+import proofs from './data/proofs'
 
-export default evaluateProofs
+describe('evaluateProofs', () => {
+  it('should return normalized, parsed, and flattened proofs', () => {
+    let normalized = normalizeProofs(proofs)
+    let parsed = parseProofs(normalized)
+    let flattened = flattenProofs(parsed)
+
+    let test = evaluateProofs(proofs)
+
+    flattened.forEach((proof, index) => expect(proof).to.deep.equal(test[index]))
+  })
+})

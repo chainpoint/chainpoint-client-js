@@ -10,7 +10,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const { expect } = require('chai')
+import { expect } from 'chai'
+import sinon from 'sinon'
 
 import submitHashes from './data/submit-hashes.json'
 import proofs from './data/proofs.json'
@@ -25,6 +26,7 @@ import {
   // flattenBtcBranches,
   normalizeProofs
 } from '../lib/utils/proofs'
+import { testArrayArg } from './helpers'
 
 describe('proof utilities', () => {
   describe('isValidProofHandle', () => {
@@ -82,13 +84,18 @@ describe('proof utilities', () => {
   })
 
   describe('normalizeProofs', () => {
-    it('should throw on incorrectly passed args', () => {
+    beforeEach(() => {
+      sinon.spy(console, 'error')
+    })
+    afterEach(() => {
+      console.error.restore()
+    })
+    it('should skip incorrectly passed args and log errors', () => {
       testArrayArg(normalizeProofs)
-      let incorrectProofType = () => normalizeProofs([{ type: 'foobar' }])
-      let emptyProofObject = () => normalizeProofs([{}])
-      let testFns = [incorrectProofType, emptyProofObject]
-
-      testFns.forEach(test => expect(test, `invoking with ${test.name} should have thrown an error`).to.throw())
+      // empty array, null proof, or non-chainpoint type proofs should all fail gracefully
+      let normalized = normalizeProofs([{}, { hashIdNode: 'i-am-an-id', proof: null }, { type: 'foobar' }])
+      expect(normalized, 'Array of normalized invalid proofs should have been empty').to.have.length(0)
+      expect(console.error.calledThrice, 'Did not log errors for each incorrect proof object').to.be.true
     })
 
     it('should normalize parsed proof objects', () => {
@@ -188,10 +195,3 @@ describe('proof utilities', () => {
     it('should return an array of objects with hash_id_node and raw btc tx')
   })
 })
-
-function testArrayArg(fn) {
-  let emptyArray = () => fn([])
-  let notArray = () => fn('not an array')
-  expect(emptyArray, 'Did not throw when passed an empty array').to.throw()
-  expect(notArray, 'Did not throw when passed a non-array').to.throw()
-}

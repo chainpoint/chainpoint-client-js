@@ -12,7 +12,8 @@
  */
 
 import utils from './lib/utils'
-import _submitHashes, { submitFileHashes as _submitFileHashes } from './lib/submit'
+import _submitHashes from './lib/submit'
+import _submitFileHashes from './lib/submitFiles'
 import _getProofs from './lib/get'
 import _verifyProofs from './lib/verify'
 import _evaluateProofs from './lib/evaluate'
