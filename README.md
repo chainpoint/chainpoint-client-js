@@ -27,7 +27,7 @@ This is an HTTP request that passes an Array of hash(es) to a Node. The Node wil
 
 ### Get Proof(s)
 
-Proofs are first anchored to the 'Calendar' chain maintained by every Node. This takes up to ten seconds. Retrieving a `hashIdNode` at this stage returns a proof anchored to the Calendar.
+Proofs are first anchored to the 'Calendar' chain maintained by every Chainpoint Core. This takes up to ten seconds. Retrieving a `hashIdNode` at this stage returns a proof anchored to the Calendar.
 
 Proofs are appended with data as they are anchored to additional blockchains. For example, it takes 60 - 90 minutes to anchor a proof to Bitcoin. Calling getProofs will now append the first proof with data that anchors it to the Bitcoin Blockchain.
 
@@ -81,11 +81,13 @@ runIt()
 
 ## Public API
 
-The following public functions are exported from this client. In each case the `callback` argument is an optional callback function which is only needed if using the Callback style API:
+The following public functions are exported from this client. All functions in the client library are written
+using Promises in the async/await style where possible. Previous versions were written in the Nodejs callback
+style, but that has since been deprecated.
 
 Additionally, the output of each function in the process has been designed so that it can be used as the input to the next with no need to manipulate the data.
 
-### `submitHashes(hashes, uris, callback)`
+### `submitHashes(hashes, uris)`
 
 #### Description
 
@@ -136,7 +138,7 @@ Example Return Value
 ]
 ```
 
-### `submitFileHashes(paths, uris, callback)`
+### `submitFileHashes(paths, uris)`
 
 #### Description
 
@@ -191,7 +193,7 @@ Example Return Value
 ]
 ```
 
-### `getProofs(proofHandles, callback)`
+### `getProofs(proofHandles)`
 
 #### Description
 
@@ -236,7 +238,7 @@ Example Return Value
 ]
 ```
 
-### `verifyProofs (proofs, uri, callback)`
+### `verifyProofs (proofs, uri)`
 
 #### Description
 
@@ -358,7 +360,7 @@ https://live.blockcypher.com/btc/block/000000000000000000bc3f3e0182f34c749756152
 
 And clicking on the `Advanced Details` button to view the block's Merkle root.
 
-### `getCores (num, callback)`
+### `getCores (num)`
 
 #### Description
 
@@ -374,7 +376,7 @@ The optional `num` argument determines the maximum number of Cores that should b
 
 This function returns an Array of String URIs.
 
-### `getNodes (num, callback)`
+### `getNodes (num)`
 
 #### Description
 
@@ -400,7 +402,7 @@ The callback style is fully supported everywhere,
 while Promises and `async/await` support will depend on the version of Node.js or Browser
 being targetted. Each public API exported from this module supports each style equally.
 
-### Callback Style Example
+### Callback Style Example [DEPRECATED]
 
 ```javascript
 var cp = require('chainpoint-client')
