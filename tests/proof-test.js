@@ -105,8 +105,6 @@ describe('proof utilities', () => {
       expect(normalized[0]).to.equal(parsedProofs[0])
     })
 
-    it('should skip a proof object ')
-
     it('should normalize a raw proof binary or submit hashes response', () => {
       let testProofs = [...proofs]
       // raw proof string in Base64
