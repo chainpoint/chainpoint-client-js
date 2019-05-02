@@ -18,7 +18,7 @@ import _getProofs from './lib/get'
 import _verifyProofs from './lib/verify'
 import _evaluateProofs from './lib/evaluate'
 
-const { flattenBtcBranches, normalizeProofs, parseProofs, getCores, getNodes } = utils
+const { flattenBtcBranches, normalizeProofs, parseProofs, getCores: _getCores, getNodes: _getNodes } = utils
 
 /**
  * retrieve raw btc tx objects for corresponding proofs
@@ -40,6 +40,8 @@ export const submitFileHashes = _submitFileHashes
 export const getProofs = _getProofs
 export const verifyProofs = _verifyProofs
 export const evaluateProofs = _evaluateProofs
+export const getNodes = _getNodes
+export const getCores = _getCores
 
 export default {
   getCores,
