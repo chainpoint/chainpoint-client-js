@@ -3,6 +3,8 @@ const fs = require('fs')
 const { expect } = require('chai')
 
 describe('E2E tests', function() {
+  // need a very long timeout now because the
+  // time from hash submission to proof creation can be up to two minutes
   this.timeout(250000)
   let hashes, proofHandlesHashes, proofHandlesFiles, proofs, nodes
 
