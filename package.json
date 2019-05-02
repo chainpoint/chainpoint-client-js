@@ -10,10 +10,10 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "lint": "eslint lib/**/*.js *.js",
-    "test": "npm run test:lint && nyc mocha --reporter spec -r esm 'tests/!(e2e)*-test.js'",
+    "test": "CHAINPOINT_CORES=http://35.245.211.97 npm run test:lint && nyc mocha --reporter spec -r esm 'tests/!(e2e)*-test.js'",
     "test:lint": "npm run lint",
-    "test:unit": "nyc mocha --reporter spec -r esm 'tests/!(e2e)*-test.js'",
-    "test:watch": "nyc mocha --reporter spec -r esm --watch 'tests/!(e2e)*-test.js'",
+    "test:unit": "CHAINPOINT_CORES=http://35.245.211.97 nyc mocha --reporter spec -r esm 'tests/!(e2e)*-test.js'",
+    "test:watch": "CHAINPOINT_CORES=http://35.245.211.97 nyc mocha --reporter spec -r esm --watch 'tests/!(e2e)*-test.js'",
     "test:e2e": "npm run webpack && mocha --reporter spec -r esm tests/e2e-test.js",
     "webpack": "webpack",
     "prepublishOnly": "webpack"
