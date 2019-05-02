@@ -20,7 +20,8 @@ import * as evaluate from '../lib/evaluate'
 import proofs from './data/proofs'
 import uris from './data/nodes'
 
-describe('verifyProofs', () => {
+describe('verifyProofs', function() {
+  this.timeout(4000)
   // verify just one proof to make calls faster
   let proof = proofs.slice(0, 1)
   let evaluatedProof = evaluate.evaluateProofs(proof)[0]
@@ -62,9 +63,9 @@ describe('verifyProofs', () => {
     expect(network.getNodes.called).to.be.true
   })
 
-  it('should verify all proofs against a single node at path /calendar/[ANCHOR_ID]/hash', async () => {
+  it('should verify all proofs against a single node at path /calendar/[ANCHOR_ID]/data', async () => {
     nock(uri)
-      .get(`/calendar/${evaluatedProof['anchor_id']}/hash`)
+      .get(`/calendar/${evaluatedProof['anchor_id']}/data`)
       .reply(200, [evaluatedProof['expected_value']])
 
     await verifyProofs(proof, uri)
@@ -73,7 +74,7 @@ describe('verifyProofs', () => {
 
   it('should throw if no hashes found/returned', async () => {
     nock(uri)
-      .get(`/calendar/${evaluatedProof['anchor_id']}/hash`)
+      .get(`/calendar/${evaluatedProof['anchor_id']}/data`)
       .reply(200)
 
     let noHashFound
@@ -88,7 +89,7 @@ describe('verifyProofs', () => {
 
   it('should return proofs with properties indicated if and when the hash was verified', async () => {
     nock(uri)
-      .get(`/calendar/${evaluatedProof['anchor_id']}/hash`)
+      .get(`/calendar/${evaluatedProof['anchor_id']}/data`)
       .reply(200, [evaluatedProof['expected_value']])
 
     let verified = await verifyProofs(proof, uri)
