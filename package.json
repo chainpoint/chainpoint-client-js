@@ -15,9 +15,9 @@
     "test:unit": "CHAINPOINT_CORES=http://35.245.211.97 nyc mocha --reporter spec -r esm 'tests/!(e2e)*-test.js'",
     "test:watch": "CHAINPOINT_CORES=http://35.245.211.97 nyc mocha --reporter spec -r esm --watch 'tests/!(e2e)*-test.js'",
     "test:e2e": "npm run webpack && mocha --reporter spec -r esm tests/e2e-test.js",
-    "webpack": "webpack",
-    "prepare": "npm run webpack",
-    "prepublishOnly": "webpack"
+    "build": "webpack",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build"
   },
   "husky": {
     "hooks": {
