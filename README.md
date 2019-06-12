@@ -18,6 +18,9 @@ The Chainpoint Client lets you retrieve and verify a Chainpoint proof. Each proo
 
 This client can be used in both Browser and Node.js based JavaScript applications using `callback` functions, Promises (using `.then`, `.catch`), or Promises (using `async`/`await`) functional styles.
 
+**Important:** This library has been updated for v2 of the Chainpoint network. This means that it won't work for older proofs and instead interacts with nodes on the new network.
+If you would like to still use this library for older proofs, please downgrade to v1.x.x
+
 ## Proof Creation and Verification Overview
 
 Creating a Chainpoint proof is an asynchronous process. This client handles all the steps for submitting hashes, retrieving proofs, and verifying proofs.
@@ -224,7 +227,8 @@ This function will return an Array of Objects, each composed of the following pr
 
 `proof` : The Base64 encoded binary form of the proof. See [https://github.com/chainpoint/chainpoint-binary](https://github.com/chainpoint/chainpoint-binary) for more information about proof formats. That library can also be used to convert from one form to another. If the proof is not yet available, or cannot be retrieved, this will be set to `null`.
 
-`anchorsComplete` : An Array of Strings that indicates which blockchains the proof is anchored to at the time of retrieval. One or more of `cal` (Calendar), `btc` (Bitcoin), or `eth` (Ethereum). If the proof is not yet available, or cannot be retrieved, this will be set to `[]` (An empty Array).
+`anchorsComplete` : An Array of Strings that indicates which blockchains the proof is anchored to at the time of retrieval. One or more of `cal` (Calendar), `btc` (Bitcoin), or `eth` (Ethereum) (you may also see `tcal` or `tbtc` for
+testnet calendar anchors and testnet bitcoin anchors respectively). If the proof is not yet available, or cannot be retrieved, this will be set to `[]` (An empty Array).
 
 Example Return Value
 
