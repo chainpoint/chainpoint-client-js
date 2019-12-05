@@ -1555,28 +1555,28 @@ chai@^4.1.2, chai@^4.2.0:
     pathval "^1.1.0"
     type-detect "^4.0.5"
 
-chainpoint-binary@^4.0.2, chainpoint-binary@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/chainpoint-binary/-/chainpoint-binary-4.1.0.tgz#0b923d6ba9828324947a2a07c11a0b8991b9d327"
-  integrity sha512-KsO9pyx/+TII8IKcG2QuE71u64hF6WoAEIDxYBj6RLfGeuLmIx9y5d7SgeJUXBP+XQLW/tfw6Kteo6aVYk0Lkg==
+chainpoint-binary@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/chainpoint-binary/-/chainpoint-binary-5.0.0.tgz#7cd9a6b7ca318836cdf00c1f16d674b2d736a3a7"
+  integrity sha512-LrwqbREUKRqllEEIcZ23QpsfREqXjSAVys9CIIf4rX7f7Hz2/HRjxEEQZZ+hEcW4JufuzvZIXSuRE8tXXFz32w==
   dependencies:
-    chainpoint-proof-json-schema "^1.1.0"
+    chainpoint-proof-json-schema "^2.0.1"
     msgpack-lite "^0.1.26"
     pako "^1.0.10"
 
-chainpoint-parse@^3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/chainpoint-parse/-/chainpoint-parse-3.3.1.tgz#737d2a9610b77debdc58df594e768ac43680acf5"
-  integrity sha512-rGkKEOnqr5sAo/I5ofjgZyec9bKp4Zp99OPcA55gauGFpbYVKrJ6X3HxSTqkhFxchb6wlG3MBjGys3JsqwZd8g==
+chainpoint-parse@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/chainpoint-parse/-/chainpoint-parse-4.0.0.tgz#66b6d23da0a326e9ac02da3338e570717604e9e1"
+  integrity sha512-HNfNys7mHoHnedLJfoktkisTqgIXTOrtTOersRbZ59xmSmp2Fk8bJrRRh8aMr79IxmNHjJXC1HBcGfJiXNo0gA==
   dependencies:
-    chainpoint-binary "^4.1.0"
-    chainpoint-proof-json-schema "^1.1.0"
+    chainpoint-binary "^5.0.0"
+    chainpoint-proof-json-schema "^2.0.1"
     js-sha3 "^0.8.0"
 
-chainpoint-proof-json-schema@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/chainpoint-proof-json-schema/-/chainpoint-proof-json-schema-1.1.0.tgz#66c1f19812785c9327b6a82a66b10e8608085fa2"
-  integrity sha512-xxLZ4lqpwW+oZHBHiFpNFY9oSd2z9fdrgRxXxy4kC0T2b/dfeYRY96qL+DN/EVl17qGVhHNd7OJRsGAdTU6eCA==
+chainpoint-proof-json-schema@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/chainpoint-proof-json-schema/-/chainpoint-proof-json-schema-2.0.1.tgz#64d83bcf2bf23d5c5194b65e2cc4d955b6ecae0f"
+  integrity sha512-mf4YGkq9XGQYuEBmyhYuX7HaF2au/zmYDfxbMV5FM3vcV8jUuUJAOQ3JGSNVvRAKE1M8kv7v+JkxUxqctdwnnQ==
   dependencies:
     is-my-json-valid "^2.20.0"
 
