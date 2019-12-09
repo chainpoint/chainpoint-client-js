@@ -944,7 +944,11 @@ export function verifyProofs(proofs, uri, callback) {
               let r = {}
 
               _forEach(nodesWithGetOpts, (getOpt, index) => {
-                r[getOpt.uri] = flatParsedBody[index]
+                if (flatParsedBody[index].length) {
+                  let uriSegments = getOpt.uri.split('/')
+                  let blockHeight = uriSegments[uriSegments.length - 2]
+                  r[blockHeight] = flatParsedBody[index]
+                }
               })
 
               return r
@@ -965,7 +969,9 @@ export function verifyProofs(proofs, uri, callback) {
               let results = []
 
               _forEach(flatProofs, flatProof => {
-                if (flatProof.expected_value === hashesFound[flatProof.uri]) {
+                let uriSegments = flatProof.uri.split('/')
+                let blockHeight = uriSegments[uriSegments.length - 2]
+                if (flatProof.expected_value === hashesFound[blockHeight]) {
                   // IT'S GOOD!
                   flatProof.verified = true
                   flatProof.verified_at =
