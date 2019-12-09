@@ -1,6 +1,6 @@
 {
   "name": "chainpoint-client",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Chainpoint API client",
   "main": "dist/bundle.js",
   "author": "Jason Bukowski <jason@tierion.com>",
