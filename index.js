@@ -11,12 +11,12 @@
  * limitations under the License.
  */
 
-const utils = require('./lib/utils')
-const _submitHashes = require('./lib/submit')
-const _submitFileHashes = require('./lib/submitFiles')
-const _getProofs = require('./lib/get')
-const _verifyProofs = require('./lib/verify')
-const _evaluateProofs = require('./lib/evaluate')
+import utils from './lib/utils'
+import _submitHashes from './lib/submit'
+import _submitFileHashes from './lib/submitFiles'
+import _getProofs from './lib/get'
+import _verifyProofs from './lib/verify'
+import _evaluateProofs from './lib/evaluate'
 
 const { flattenBtcBranches, normalizeProofs, parseProofs, getCores: _getCores, getNodes: _getNodes } = utils
 
@@ -26,20 +26,30 @@ const { flattenBtcBranches, normalizeProofs, parseProofs, getCores: _getCores, g
  * @returns {Object[]} - array of objects with relevant hash data
  */
 
-function getProofTxs(proofs) {
+export function getProofTxs(proofs) {
   let normalizedProofs = normalizeProofs(proofs)
   let parsedProofs = parseProofs(normalizedProofs)
   let flatProofs = flattenBtcBranches(parsedProofs)
   return flatProofs
 }
 
-module.exports = {
-  getCores: _getCores,
-  getNodes: _getNodes,
-  submitHashes: _submitHashes,
-  submitFileHashes: _submitFileHashes,
-  getProofs: _getProofs,
-  verifyProofs: _verifyProofs,
-  evaluateProofs: _evaluateProofs,
-  getProofTxs: getProofTxs
+// Need this to keep expected import structure for backwards compatibility
+// with downstream dependencies
+export const submitHashes = _submitHashes
+export const submitFileHashes = _submitFileHashes
+export const getProofs = _getProofs
+export const verifyProofs = _verifyProofs
+export const evaluateProofs = _evaluateProofs
+export const getNodes = _getNodes
+export const getCores = _getCores
+
+export default {
+  getCores,
+  getNodes,
+  submitHashes,
+  submitFileHashes,
+  getProofs,
+  verifyProofs,
+  evaluateProofs,
+  getProofTxs
 }
