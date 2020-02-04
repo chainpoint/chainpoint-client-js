@@ -130,13 +130,13 @@ Example Return Value
   {
     uri: 'http://0.0.0.0',
     hash: '1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
-    hashIdNode: 'df500460-d7d1-11e8-992b-0178d9540713',
+    proofId: 'df500460-d7d1-11e8-992b-0178d9540713',
     groupId: 'dfa4b410-d7d1-11e8-a6e3-c763418c848e'
   },
   {
     uri: 'http://0.0.0.0',
     hash: '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
-    hashIdNode: 'df502b70-d7d1-11e8-992b-0187b4b6e491',
+    proofId: 'df502b70-d7d1-11e8-992b-0187b4b6e491',
     groupId: 'dfa4b411-d7d1-11e8-a6e3-c763418c848e'
   }
 ]
@@ -183,14 +183,14 @@ Example Return Value
   {
     uri: 'http://0.0.0.0',
     hash: '9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
-    hashIdNode: 'a512e430-d3cb-11e7-aeb7-01eecbb37e34',
+    proofId: 'a512e430-d3cb-11e7-aeb7-01eecbb37e34',
     path: './datafile.json',
     groupId: 'dc1c8cd0-d7d3-11e8-8a5c-7fe62f82e5c3'
   },
   {
     uri: 'http://0.0.0.0',
     hash: '9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
-    hashIdNode: 'a4b6e180-d3cb-11e7-90bc-014342a27e15',
+    proofId: 'a4b6e180-d3cb-11e7-90bc-014342a27e15',
     path: './folder/otherfile.csv',
     groupId: 'dc1c8cd1-d7d3-11e8-8a5c-7fe62f82e5c3'
   }
@@ -235,10 +235,10 @@ Example Return Value
 ```javascript
 ;[
   {
-    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
+    proofId: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
     proof:
-      'eJytVjlvpEUQhf+CiDCu7upzopXIECERiVVdBx5psS17uMKFhBBSMmC5ViRIiJD/YcSP4c14dwHbCJAYjTTWePp1Vb2jvk++e6DnZzv/YPfL6W53cbU5Pn6ft/bq+eXbx3oq27OL8+3Z7vg9frz78MKfvPb8q8encnV6/cDExU2NMynFymIeIitVV2IpuazVZUwRcp1paNMyqSm3pq07tx/2MCdbOzk7N79+yUsPokVHxrGOUvJ+NM3mEQFwtVTGqPrz4cjVu+ud7W7nNydPZPdTptRx5CiPN6luMm3KeOs5vJ5fHuCFZu5/hl/FEuAb11k1UNZt+P3Jv4P/bl3KmZ761Wcff/1Qlj/8UeXhyf6r88uTm/99dX5x9fmjLx5ev3Koc2ubf9Pjoy/PL769OpWjXNvh8KGKw+F/7uD24U/Ptle7TaopjdIK0YbXStJWyWlpqrOZhTB5cOI+essl6mgys0ZalsGT4QBKGwtXr9J8zMyqpG1qDbzdzVdxGuhhaSsym7eeluz5D81URyXlmmstYXy7wN5mnXk8L7H2Tdo8k6O++ocO97LcYMSbmwOPvri8fiBFCqVEA8hV14DYUI9qztlbI0+9kJnXLMqTZiJqjl/nYk3x8ddpfXvDHfg86P0r3PX9Uzq39s3NrY/fvdxefXZ99HcFHuOQn5lcHt/8/ngvqD+U8tFTpayd3lXKby+8vB/I/9vUHlDBGFmhPhpFm5EbN5faWp4zTU+gfoDSkgM3RYwuvfY16mCuK6LdAZyA0hEJok3JnItkSU7TCuNdpofONZP7VA2bxGxhTrkUBIZO+ysgeKzRSllFdVTzkq1ALPsStC/nOa059F0jITiWxKzNUmorFqTaMnu9A4hGKMeg0Wfl3IarRac8tKLLngXQGCkNJUid5pxlzaiL4YTOandb7h4ZVEDxUR2moTRyQ7PIvxh1elOZLm0aIe5g0zqtuyMM0VIA9Bbgry++TiDu8EoZ987sEH8xUkTk4oXrQtZi8MySB5HwVCrelWjwGh3xOgICgR2fIcHVg6lUyhnfeMNHijRXauGodPaFkRiaDq5RUaV1doBPx1SaL1ERmzD8NB8LKFRtpi4ZA0kI+FGlFqAW1GNT3MlRzPA5Q3oUlJb6KMMxxGrFvDf0lihXL4QMgNjGsEqloT0Dl+IzL7CKbRGxpKa+tBcJnuisC+OCPMBePH1RpluvnJtk2jP+hoxUljwfKqXZEWOpgOaAVEvOAYKnGHfIvwkk32KZsvCaLGMM0Wdn92Q9eUrW0Qf5IIDWJ2NtUUApCwoKpFnm6Gn0FOgAQhIWipCKpdekKahDqgbEN9DZvZikoKijpBVgtjdIG7MsnVvRAu3rABmYGnzuQ7hifj0RepgMYu+tE5LjHhYNhKNdrlQpOriAkFZWrOJlrVdItKBqsAG7I1lYA21hJdyHyYgaC1/srRrQGJmOIOqoJGqD0dgJw9AlnpH8UdS6aZaBQvYKuoMJh3aslooNQ6tbkxh4UNA1oV2kheeaFK7Nnqz0CqQMeliljm6rYepW7sPkvAp42O+57pq5E+jBz3PB+nEEh/aEK6RULKx91wmmADZKToVC7sNEZKSMGISeMSDGkuqyzDGO3h38WaeFIvdp3YZ0M7h0wSaeG/b5zb67Pc/JaSWLPbXY3ZEI/mM0VytOw+jewsTAIBI5IWEwGjgh516QKiT3cgQrQN4LOzplAxmMR4XJlpNObvgj5sAkkX2QAVIZuwlRPByiF8l4OLsPc/XSuhZDVnKG/msg+QW6X1YFnrfVqWJBQJPR4L0oLEgBWAC893kXE/NMnoRtFE4dtVKHD1E6XD8QI5gIlRKrrQHOU6WENMVjReEORSQfd+u8vbWxWv+0tQvE0OZ/2doNVj422cnvD4t98Q==',
-    anchorsComplete: ['cal', 'btc']
+      'eJylVc1qZFUQ9jlcu+10VZ3/rAKCT+DKTahzqk7SENKhux3HZRRcO/oEo5EZB1wIrn2PgA/jdzMZBye9EDzQNPfce+vUV9/P/e712dheH/z54c/Lw+Fmf7pefxU2drLdXazHpW6ub7ab68P6Wbw7fH3jbz79Z+vuUveX92cTS4qITA85G/Xaau0lsIzcNZN7FIlcrUnPMmz0wtOlNXYvofHrm912O883dv9JcoohGK1iNl0xu660NF8Rl8ktJkmFf1tOPd/58M0ztz+EhFYkKwqfSzhlOpX6xeu+0+tx6fsX3/5ypd2v3ujFxc4v9LDd/by92X//5IHfh16dL1vb3fnbe8tzP96+vLr/4XqzPzyTU06VSuFIdGpJtcxpappm7m3kEgOuJabBJl2GBoCvjv+USubKo1aZpQwfpkEDRauucTYlaaEGppa4FhRLSh2VuVtp1oKpdDWLyW1Gwu3c2G5/2t682l/qSlK+ffW2bUB54OfuACi/PkLBTM8Kpza9JurZrCeeM5GNaDF2Vg0ZPFVPohbbFJ6Wa+dhNErRqTna3Ze7zf7FfV+0AWmEEw7pJMUTkbTGUX5tulv/30PWpgd9z8o3j6z0w3jKyl8ffXz7cgfdxSJubc5AENdE6WYFs7c6eY7SKI3Yi1DsOgTjJHTHKUBxrZah+V9TBNFnXQuVnspsrgapFsy/hcjFZuvoP1QAaD59cPIIdgc0nafW0lWotA8LHojp7WLOTCkPOCR0cJgwnjFnjR6oJ2MgIYtauIh2ibk76gaTisLSa31XB2s+Lsj+gyWS0cYyms+oOmwHwO/Oz/hFFfU0CP2Tt9BhNEmN2oxQbKylhJKxM8a7txY8bx7xrJ7Lw4wwuJGB2VKdnSquLJeStSpVgmAJ7A7vLoaThMOoLTt24JQ+Q9ZjNQOZxuGhSx6Jos/u8FVHY1181NnIK4dGwTKlJTtyVsCNM4DrPtuTmhCHyezchKMs7eYM1OitthkCmAsJUikt8yzRfUQei1o7DN47tIJkOlYzBsScLuFGGMCkwX2Bamla8bYYthVkHQQBpAHe56acyEchDNjisZo12GgKqI20gg1UcYytN4+Ihe5hlh7YJViKozLrAPTpS9dtQp7HaqJLR5MTIcTQCQIpDlbOyF1TpUixjp6RWAvkjkypHGud8C7AxTSP1SzuME9VnGo+Ug8jtw6CK/YlB1F2CIgKNyR1aosXuaWpHmJJedajHFGKnA0yQu5Dsci90BGqYXmTvWFkzXoVyLiARSmlGK4sFITlSPlYTWU4N9tMMLgoOKKJbgesBA/2aAKbxTLr4Iqp41ihNnpY1Kw08/iw5pN0RSS9T9dXnHOssf6njMTnDiKLCHumPvISB8IemuJjWQgx06pDB6CENKFj6DZQJoP78WXo5SEj/wbUW3Ki',
+    anchorsComplete: ['tcal', 'tbtc']
   }
 ]
 ```
@@ -253,9 +253,9 @@ This function is used to verify proofs by comparing the values arrived at by par
 
 The `proofs` argument accepts an Array of Strings or Objects.
 
-If a String, it is expected to be a Chainpoint 3.0 proof in either Base64 encoded binary, or JSON-LD form.
+If a String, it is expected to be a Chainpoint 4.0 proof in either Base64 encoded binary, or JSON-LD form.
 
-If an Object it can be a Chainpoint 3.0 proof as an Object, or have a `proof` property containing a String proof as described above as is created by the output of `getProofs()`.
+If an Object it can be a Chainpoint 4.0 proof as an Object, or have a `proof` property containing a String proof as described above as is created by the output of `getProofs()`.
 
 Proof types can be mixed freely in the `proofs` arg Array.
 
@@ -275,10 +275,8 @@ Example Return Value
 ;[
   {
     hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
-    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
-    hashIdCore: 'e4a09270-d3fb-11e7-b4d1-0163595cf66c',
-    hashSubmittedNodeAt: '2017-11-28T05:20:48Z',
-    hashSubmittedCoreAt: '2017-11-28T05:20:48Z',
+    proof_id: "5e0433d0-46da-11ea-a79e-017f19452571",
+    hash_received: "2020-02-03T23:10:28Z",
     uri: 'http://127.0.0.1/calendar/695928/hash',
     type: 'cal',
     anchorId: '695928',
@@ -288,10 +286,8 @@ Example Return Value
   },
   {
     hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
-    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
-    hashIdCore: 'e4a09270-d3fb-11e7-b4d1-0163595cf66c',
-    hashSubmittedNodeAt: '2017-11-28T05:20:48Z',
-    hashSubmittedCoreAt: '2017-11-28T05:20:48Z',
+    proof_id: "5e0433d0-46da-11ea-a79e-017f19452571",
+    hash_received: "2020-02-03T23:10:28Z",
     uri: 'http://127.0.0.1/calendar/696030/data',
     type: 'btc',
     anchorId: '496469',
@@ -314,9 +310,9 @@ For example, this can be used to easily verify that a proof that is anchored to 
 
 The `proofs` argument accepts an Array of Strings or Objects.
 
-If a String, it is expected to be a Chainpoint 3.0 proof in either Base64 encoded binary, or JSON-LD form.
+If a String, it is expected to be a Chainpoint 4.0 proof in either Base64 encoded binary, or JSON-LD form.
 
-If an Object it can be a Chainpoint 3.0 proof as an Object, or have a `proof` property containing a String proof as described above as is created by the output of `getProofs()`.
+If an Object it can be a Chainpoint 4.0 proof as an Object, or have a `proof` property containing a String proof as described above as is created by the output of `getProofs()`.
 
 Proof types can be mixed freely in the `proofs` arg Array.
 
@@ -334,10 +330,8 @@ Example Return Value
 ;[
   {
     hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
-    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
-    hashIdCore: 'e4a09270-d3fb-11e7-b4d1-0163595cf66c',
-    hashSubmittedNodeAt: '2017-11-28T05:20:48Z',
-    hashSubmittedCoreAt: '2017-11-28T05:20:48Z',
+    proof_id: "5e0433d0-46da-11ea-a79e-017f19452571",
+    hash_received: "2020-02-03T23:10:28Z",
     uri: 'http://127.0.0.1/calendar/695928/hash',
     type: 'cal',
     anchorId: '695928',
@@ -345,10 +339,8 @@ Example Return Value
   },
   {
     hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
-    hashIdNode: 'e47f00b0-d3fb-11e7-9dd9-015eb614885c',
-    hashIdCore: 'e4a09270-d3fb-11e7-b4d1-0163595cf66c',
-    hashSubmittedNodeAt: '2017-11-28T05:20:48Z',
-    hashSubmittedCoreAt: '2017-11-28T05:20:48Z',
+    proof_id: "5e0433d0-46da-11ea-a79e-017f19452571",
+    hash_received: "2020-02-03T23:10:28Z",
     uri: 'http://127.0.0.1/calendar/696030/data',
     type: 'btc',
     anchorId: '496469',
@@ -358,12 +350,6 @@ Example Return Value
 ```
 
 In this case, you can use a block explorer to confirm that BTC block ID `496469` has a block Merkle root value (`expectedValue`) of `de999f26afcdd855552ca91184aba496baa48bf59a7125180d7c1d7d520ea88b`. If it does, that means this proof can be provably said to anchor its hash to that Bitcoin block.
-
-You can confirm this example by visiting:
-
-https://live.blockcypher.com/btc/block/000000000000000000bc3f3e0182f34c749756152373a2df89f634bcd7789017/
-
-And clicking on the `Advanced Details` button to view the block's Merkle root.
 
 ### `getCores (num)`
 
