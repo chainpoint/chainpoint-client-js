@@ -1,3 +1,5 @@
+# Important: This package is now deprecated. Please use [chainpoint-js](https://github.com/chainpoint/chainpoint-js) instead.
+
 # Chainpoint Client (JavaScript)
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
@@ -275,8 +277,8 @@ Example Return Value
 ;[
   {
     hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
-    proof_id: "5e0433d0-46da-11ea-a79e-017f19452571",
-    hash_received: "2020-02-03T23:10:28Z",
+    proof_id: '5e0433d0-46da-11ea-a79e-017f19452571',
+    hash_received: '2020-02-03T23:10:28Z',
     uri: 'http://127.0.0.1/calendar/695928/hash',
     type: 'cal',
     anchorId: '695928',
@@ -286,8 +288,8 @@ Example Return Value
   },
   {
     hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
-    proof_id: "5e0433d0-46da-11ea-a79e-017f19452571",
-    hash_received: "2020-02-03T23:10:28Z",
+    proof_id: '5e0433d0-46da-11ea-a79e-017f19452571',
+    hash_received: '2020-02-03T23:10:28Z',
     uri: 'http://127.0.0.1/calendar/696030/data',
     type: 'btc',
     anchorId: '496469',
@@ -330,8 +332,8 @@ Example Return Value
 ;[
   {
     hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
-    proof_id: "5e0433d0-46da-11ea-a79e-017f19452571",
-    hash_received: "2020-02-03T23:10:28Z",
+    proof_id: '5e0433d0-46da-11ea-a79e-017f19452571',
+    hash_received: '2020-02-03T23:10:28Z',
     uri: 'http://127.0.0.1/calendar/695928/hash',
     type: 'cal',
     anchorId: '695928',
@@ -339,8 +341,8 @@ Example Return Value
   },
   {
     hash: 'daeaedcd320c0fb2adefaab15ec03a424bb7a89aa0ec918c6c4906c366c67e36',
-    proof_id: "5e0433d0-46da-11ea-a79e-017f19452571",
-    hash_received: "2020-02-03T23:10:28Z",
+    proof_id: '5e0433d0-46da-11ea-a79e-017f19452571',
+    hash_received: '2020-02-03T23:10:28Z',
     uri: 'http://127.0.0.1/calendar/696030/data',
     type: 'btc',
     anchorId: '496469',
